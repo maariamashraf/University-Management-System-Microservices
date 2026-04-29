@@ -1,18 +1,24 @@
 # University Management System Microservices
 
-This repository currently contains infrastructure orchestration (`docker-compose.yml`) and a partial implementation of the `academic-core` service focused on Kafka event publishing.
+This repository contains the backend microservices and infrastructure orchestration for the University Management System.
 
-## What is included
+## Project Structure
 
-- `docker-compose.yml` with definitions for:
-  - Infrastructure: Zookeeper, Kafka, Kafka UI, Redis, MySQL
-  - Platform/services (referenced as build contexts): Eureka Server, API Gateway, IAM, Academic Core, Communication Service, Frontend
-- `academic-core` source files for Kafka producer integration:
-  - Event publisher adapter (`KafkaEventPublisher`)
-  - Event payload models (`StudentEnrolledEvent`, `AnnouncementCreatedEvent`, `CourseCreatedEvent`)
-  - Kafka producer config and topic bean config
+The project currently includes the following microservices located in the `Backend/` directory:
+- **`api-gateway`**: Spring Cloud Gateway for routing requests.
+- **`eureka-server`**: Service Registry for microservice discovery.
+- **`academic-core-Service`**: Core academic operations handling event publishing via Kafka.
 
-## Current state
+## Infrastructure
 
-- The repository snapshot is partial: service directories referenced in `docker-compose.yml` (for example `eureka-server`, `api-gateway`, `iam-service`, `communication-service`, `frontend`) are not present here yet.
-- Build files for `academic-core` (`pom.xml` or `build.gradle`) are also not present in this snapshot.
+The `docker-compose.yml` file provides orchestration for the following:
+- **Zookeeper & Kafka**: For event-driven communication (e.g., `user-registered`, `student-enrolled`, `course-created`).
+- **Kafka UI**: For monitoring Kafka topics and clusters.
+- **Redis**: Caching layer.
+- **MySQL**: Shared database for the microservices.
+
+## Current State
+
+- The initial microservices have been scaffolded and moved into the `Backend/` directory.
+- `academic-core-Service` is implemented with full build files (`pom.xml`) and includes Kafka producer integration (e.g., `KafkaConfig`, `KafkaTopics`) along with event payload models.
+- **Note**: The `docker-compose.yml` build contexts currently point to the root directories (e.g., `./eureka-server`). If you are building the images via Docker Compose, make sure to update the context paths to point to the `Backend/` directory (e.g., `./Backend/eureka-server`).
