@@ -1,0 +1,51 @@
+package com.unisystem.academic_core_service.domain.application.services;
+
+import com.unisystem.academic_core_service.domain.application.port.in.CreateAnnouncementUseCase;
+import com.unisystem.academic_core_service.domain.application.port.out.AnnouncementRepositoryPort;
+import com.unisystem.academic_core_service.domain.application.port.out.CourseRepositoryPort;
+import com.unisystem.academic_core_service.domain.application.port.out.EventPublisherPort;
+import com.unisystem.academic_core_service.domain.events.AnnouncementCreatedEvent;
+import com.unisystem.academic_core_service.domain.model.Announcement;
+
+import java.time.LocalDateTime;
+
+public class CreateAnnouncementService implements CreateAnnouncementUseCase {
+
+    private final AnnouncementRepositoryPort announcementRepository;
+    private final CourseRepositoryPort courseRepository;
+    private final EventPublisherPort eventPublisher;
+
+    public CreateAnnouncementService(
+            AnnouncementRepositoryPort announcementRepository,
+            CourseRepositoryPort courseRepository,
+            EventPublisherPort eventPublisher
+    ) {
+        this.announcementRepository = announcementRepository;
+        this.courseRepository = courseRepository;
+        this.eventPublisher = eventPublisher;
+    }
+
+    @Override
+    public Announcement create(CreateAnnouncementCommand command) {
+        if (command.courseId() == null || courseRepository.findById(command.courseId()).isEmpty()) {
+            throw new RuntimeException("Course not found");
+        }
+
+        Announcement announcement = new Announcement();
+        announcement.setTitle(command.title());
+        announcement.setContent(command.content());
+        announcement.setCourseId(command.courseId());
+        announcement.setCreatedAt(command.createdAt() != null ? command.createdAt() : LocalDateTime.now());
+
+        Announcement savedAnnouncement = announcementRepository.save(announcement);
+
+        AnnouncementCreatedEvent event = new AnnouncementCreatedEvent(
+                savedAnnouncement.getId().toString(),
+                savedAnnouncement.getCourseId().toString(),
+                savedAnnouncement.getCreatedAt()
+        );
+        eventPublisher.publishAnnouncementCreated(event);
+
+        return savedAnnouncement;
+    }
+}
