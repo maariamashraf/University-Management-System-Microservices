@@ -1,9 +1,17 @@
 package com.unisystem.academic_core_service.infrastructure.config;
-
 import org.springframework.cache.CacheManager;
-import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.cache.RedisCacheConfiguration;
+import org.springframework.data.redis.cache.RedisCacheManager;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.serializer.GenericJacksonJsonRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializationContext;
+import tools.jackson.databind.ObjectMapper;
+
+import java.time.Duration;
+import java.util.Set;
 
 @Configuration
 public class CacheConfig {
@@ -26,8 +34,17 @@ public class CacheConfig {
     public static final String FEEDBACK_ALL_CACHE = "feedbackAll";
 
     @Bean
-    public CacheManager cacheManager() {
-        return new ConcurrentMapCacheManager(
+    @Primary
+    public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
+        RedisCacheConfiguration defaultConfig = RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(Duration.ofMinutes(10))
+                .serializeValuesWith(
+                        RedisSerializationContext.SerializationPair.fromSerializer(
+                                new GenericJacksonJsonRedisSerializer(new ObjectMapper())
+                        )
+                );
+
+        Set<String> cacheNames = Set.of(
                 ANNOUNCEMENTS_BY_COURSE_CACHE,
                 COURSES_ALL_CACHE,
                 COURSES_BY_ID_CACHE,
@@ -45,5 +62,10 @@ public class CacheConfig {
                 FEEDBACK_BY_ID_CACHE,
                 FEEDBACK_ALL_CACHE
         );
+
+        return RedisCacheManager.builder(redisConnectionFactory)
+                .cacheDefaults(defaultConfig)
+                .initialCacheNames(cacheNames)
+                .build();
     }
 }
