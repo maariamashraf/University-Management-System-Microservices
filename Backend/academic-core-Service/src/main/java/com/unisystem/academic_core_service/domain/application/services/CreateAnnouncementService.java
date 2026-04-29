@@ -6,6 +6,8 @@ import com.unisystem.academic_core_service.domain.application.port.out.CourseRep
 import com.unisystem.academic_core_service.domain.application.port.out.EventPublisherPort;
 import com.unisystem.academic_core_service.domain.events.AnnouncementCreatedEvent;
 import com.unisystem.academic_core_service.domain.model.Announcement;
+import com.unisystem.academic_core_service.infrastructure.config.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
 
 import java.time.LocalDateTime;
 
@@ -26,6 +28,7 @@ public class CreateAnnouncementService implements CreateAnnouncementUseCase {
     }
 
     @Override
+    @CacheEvict(cacheNames = CacheConfig.ANNOUNCEMENTS_BY_COURSE_CACHE, key = "#command.courseId()")
     public Announcement create(CreateAnnouncementCommand command) {
         if (command.courseId() == null || courseRepository.findById(command.courseId()).isEmpty()) {
             throw new RuntimeException("Course not found");

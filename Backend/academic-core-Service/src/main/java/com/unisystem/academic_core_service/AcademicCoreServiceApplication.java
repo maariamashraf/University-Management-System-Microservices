@@ -2,8 +2,10 @@ package com.unisystem.academic_core_service;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
 
 @SpringBootApplication
+@EnableCaching
 public class AcademicCoreServiceApplication {
 
 	public static void main(String[] args) {
