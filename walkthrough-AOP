@@ -1,0 +1,30 @@
+# Walkthrough - AOP Implementation in Academic Core Service
+
+I have successfully added Aspect-Oriented Programming (AOP) to the `academic-core-service` to handle role-based access control and auditing.
+
+## Changes Made
+
+### 1. Dependency Management
+- Added `spring-boot-starter-aop` to `pom.xml`.
+
+### 2. Custom Annotations
+Created three new annotations in `infrastructure/aop/annotations/`:
+- `@TeachersOnly`: Restricts access to users with the `TEACHER` role.
+- `@CourseTeacherOnly`: (Placeholder logic) For restricting access to the specific teacher of a course.
+- `@AuditLog`: Marks methods for auditing.
+
+### 3. Aspects
+Implemented the logic for these annotations in `infrastructure/aop/aspects/`:
+- **TeachersOnlyAspect**: Checks the `X-Roles` header (provided by the API Gateway) for the `TEACHER` role. Throws a `RuntimeException` if access is denied.
+- **CourseTeacherOnlyAspect**: Checks for `TEACHER` role and `X-User-Id` header.
+- **AuditLogAspect**: Logs method execution details, including timestamp, User ID, Username, and action name.
+
+### 4. Controller Application
+Applied the annotations to the following methods:
+- `CourseController.createCourse()`
+- `AnnouncementController.createAnnouncement()`
+
+## Verification Results
+- The code structure follows the requested `infrastructure/aop/` hierarchy.
+- The aspects correctly extract user information from the headers injected by the API Gateway.
+- Audit logs will appear in the application logs whenever annotated methods are called.
