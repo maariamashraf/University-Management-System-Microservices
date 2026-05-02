@@ -136,7 +136,7 @@ services:
 
   eureka-server:
     build:
-      context: ./eureka-server
+      context: ./Backend/eureka-server
       dockerfile: Dockerfile
     container_name: eureka-server
     networks: [unisystem-net]
@@ -159,7 +159,7 @@ services:
 
   api-gateway:
     build:
-      context: ./api-gateway
+      context: ./Backend/api-gateway
       dockerfile: Dockerfile
     container_name: api-gateway
     networks: [unisystem-net]
@@ -173,6 +173,7 @@ services:
       SERVER_PORT: 8080
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka
       EUREKA_INSTANCE_PREFER_IP_ADDRESS: 'true'
+      JWT_SECRET: ${JWT_SECRET:-mySuperSecretKey2026UniSystemXYZ!}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
       interval: 15s
@@ -185,7 +186,7 @@ services:
 
   iam-service:
     build:
-      context: ./iam-service
+      context: ./Backend/iam-service
       dockerfile: Dockerfile
     container_name: iam-service
     networks: [unisystem-net]
@@ -204,11 +205,12 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://shared-db:3306/helwanuni?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: "01125867988"
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_KAFKA_CONSUMER_GROUP_ID: iam-group
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka
       EUREKA_INSTANCE_PREFER_IP_ADDRESS: 'true'
-      JWT_SECRET: ${JWT_SECRET:-change-me-in-production-min-32-chars}
+      JWT_SECRET: ${JWT_SECRET:-mySuperSecretKey2026UniSystemXYZ!}
       JWT_EXPIRATION_MS: 86400000
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
@@ -222,7 +224,7 @@ services:
 
   academic-core:
     build:
-      context: ./academic-core
+      context: ./Backend/academic-core-Service
       dockerfile: Dockerfile
     container_name: academic-core
     networks: [unisystem-net]
@@ -260,8 +262,9 @@ services:
   # ══════════════════════════════════════════
 
   communication-service:
+    profiles: ["full"]
     build:
-      context: ./communication-service
+      context: ./Backend/communication-service
       dockerfile: Dockerfile
     container_name: communication-service
     networks: [unisystem-net]
@@ -296,8 +299,9 @@ services:
   # ══════════════════════════════════════════
 
   frontend:
+    profiles: ["full"]
     build:
-      context: ./frontend
+      context: ./FrontEnd
       dockerfile: Dockerfile
     container_name: frontend
     networks: [unisystem-net]
