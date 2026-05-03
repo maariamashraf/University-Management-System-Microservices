@@ -40,7 +40,13 @@ public class AuthService {
     // ─────────────────────────────────────────────
 
     @Transactional
-    public AuthResponse register(RegisterRequest request) {
+    public AuthResponse register(RegisterRequest request, String currentRole) {
+        if (request.getRole() == Role.ADMIN) {
+            if (currentRole == null || !currentRole.contains("ADMIN")) {
+                throw new org.springframework.security.access.AccessDeniedException("Only an existing ADMIN can register another ADMIN");
+            }
+        }
+
         // Uniqueness checks
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new UserAlreadyExistsException("Username already taken: " + request.getUsername());
@@ -64,8 +70,6 @@ public class AuthService {
                 .token(token)
                 .userId(user.getId())
                 .username(user.getUsername())
-                .email(user.getEmail())
-                .role(user.getRole())
                 .build();
     }
 
@@ -88,8 +92,35 @@ public class AuthService {
                 .token(token)
                 .userId(user.getId())
                 .username(user.getUsername())
-                .email(user.getEmail())
-                .role(user.getRole())
+                .build();
+    }
+
+    // ─────────────────────────────────────────────
+    // Refresh
+    // ─────────────────────────────────────────────
+
+    public AuthResponse refresh(String token) {
+        if (!jwtUtils.validateToken(token)) {
+            throw new RuntimeException("Invalid or expired token");
+        }
+        String username = jwtUtils.getUsernameFromToken(token);
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        org.springframework.security.core.userdetails.UserDetails userDetails =
+                org.springframework.security.core.userdetails.User.builder()
+                        .username(user.getUsername())
+                        .password(user.getPassword() != null ? user.getPassword() : "")
+                        .roles(user.getRole().name())
+                        .build();
+
+        Authentication auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        String newToken = jwtUtils.generateToken(auth);
+
+        return AuthResponse.builder()
+                .token(newToken)
+                .userId(user.getId())
+                .username(user.getUsername())
                 .build();
     }
 
@@ -98,39 +129,38 @@ public class AuthService {
     // ─────────────────────────────────────────────
 
     private User buildUser(RegisterRequest req) {
-        String hashed = passwordEncoder.encode(req.getPassword());
+    String hashed = passwordEncoder.encode(req.getPassword());
 
-        return switch (req.getRole()) {
-            case STUDENT -> {
-                Student s = new Student();
-                s.setUsername(req.getUsername());
-                s.setEmail(req.getEmail());
-                s.setPassword(hashed);
-                s.setRole(Role.STUDENT);
-                s.setStudentNumber(req.getStudentNumber());
-                s.setDepartment(req.getDepartment());
-                s.setYearOfStudy(req.getYearOfStudy());
-                yield s;
-            }
-            case TEACHER -> {
-                Teacher t = new Teacher();
-                t.setUsername(req.getUsername());
-                t.setEmail(req.getEmail());
-                t.setPassword(hashed);
-                t.setRole(Role.TEACHER);
-                t.setFaculty(req.getFaculty());
-                t.setOfficeNumber(req.getOfficeNumber());
-                t.setSpecialization(req.getSpecialization());
-                yield t;
-            }
-            case ADMIN -> {
-                Admin admin = new Admin();
-                admin.setUsername(req.getUsername());
-                admin.setEmail(req.getEmail());
-                admin.setPassword(hashed);
-                admin.setRole(Role.ADMIN);
-                yield admin;
-            }
-        };
-    }
+    return switch (req.getRole()) {
+        case STUDENT -> {
+            Student s = new Student();
+            s.setUsername(req.getUsername());
+            s.setEmail(req.getEmail());
+            s.setPassword(hashed);
+            s.setRole(Role.STUDENT);
+            s.setStudentNumber(req.getStudentNumber());
+            s.setDepId(req.getDepId());
+            s.setYearOfStudy(req.getYearOfStudy());
+            yield s;
+        }
+        case TEACHER -> {
+            Teacher t = new Teacher();
+            t.setUsername(req.getUsername());
+            t.setEmail(req.getEmail());
+            t.setPassword(hashed);
+            t.setRole(Role.TEACHER);
+            t.setOfficeNumber(req.getOfficeNumber());
+            t.setSpecialization(req.getSpecialization());
+            yield t;
+        }
+        case ADMIN -> {
+            Admin admin = new Admin();
+            admin.setUsername(req.getUsername());
+            admin.setEmail(req.getEmail());
+            admin.setPassword(hashed);
+            admin.setRole(Role.ADMIN);
+            yield admin;
+        }
+    };
+}
 }

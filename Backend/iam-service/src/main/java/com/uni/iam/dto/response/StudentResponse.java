@@ -26,6 +26,6 @@ public class StudentResponse {
 
     // Student-specific fields
     private String studentNumber;
-    private String department;
+    private Long depId;
     private Integer yearOfStudy;
 }

@@ -17,7 +17,7 @@ services:
   zookeeper:
     image: confluentinc/cp-zookeeper:7.5.0
     container_name: zookeeper
-    networks: [unisystem-net]
+    networks: [ unisystem-net ]
     ports:
       - "2181:2181"
     environment:
@@ -26,7 +26,7 @@ services:
     volumes:
       - zookeeper-data:/var/lib/zookeeper/data
     healthcheck:
-      test: ["CMD", "nc", "-z", "localhost", "2181"]
+      test: [ "CMD", "nc", "-z", "localhost", "2181" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -34,7 +34,7 @@ services:
   kafka:
     image: confluentinc/cp-kafka:7.5.0
     container_name: kafka
-    networks: [unisystem-net]
+    networks: [ unisystem-net ]
     ports:
       - "9092:9092"
       - "29092:29092"
@@ -53,7 +53,7 @@ services:
     volumes:
       - kafka-data:/var/lib/kafka/data
     healthcheck:
-      test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "localhost:29092"]
+      test: [ "CMD", "kafka-broker-api-versions", "--bootstrap-server", "localhost:9092" ]
       interval: 15s
       timeout: 10s
       retries: 10
@@ -61,11 +61,11 @@ services:
   kafka-init:
     image: confluentinc/cp-kafka:7.5.0
     container_name: kafka-init
-    networks: [unisystem-net]
+    networks: [ unisystem-net ]
     depends_on:
       kafka:
         condition: service_healthy
-    entrypoint: ["/bin/sh", "-c"]
+    entrypoint: [ "/bin/sh", "-c" ]
     command: |
       "
       echo 'Waiting for Kafka...'
@@ -83,7 +83,7 @@ services:
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
     container_name: kafka-ui
-    networks: [unisystem-net]
+    networks: [ unisystem-net ]
     ports:
       - "8090:8080"
     depends_on:
@@ -97,14 +97,14 @@ services:
   redis:
     image: redis:7.2-alpine
     container_name: redis
-    networks: [unisystem-net]
+    networks: [ unisystem-net ]
     ports:
       - "6379:6379"
     volumes:
       - redis-data:/data
     command: redis-server --appendonly yes
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: [ "CMD", "redis-cli", "ping" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -116,16 +116,16 @@ services:
   shared-db:
     image: mysql:8.0
     container_name: shared-db
-    networks: [unisystem-net]
+    networks: [ unisystem-net ]
     ports:
-      - "3306:3306"          # same port as localhost:3306 your team uses locally
+      - "3306:3306" # same port as localhost:3306 your team uses locally
     environment:
       MYSQL_ROOT_PASSWORD: "01125867988"
       MYSQL_DATABASE: helwanuni
     volumes:
       - shared-db-data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p01125867988"]
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p01125867988" ]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -139,7 +139,7 @@ services:
       context: ./Backend/eureka-server
       dockerfile: Dockerfile
     container_name: eureka-server
-    networks: [unisystem-net]
+    networks: [ unisystem-net ]
     ports:
       - "8761:8761"
     environment:
@@ -148,7 +148,7 @@ services:
       EUREKA_CLIENT_REGISTER_WITH_EUREKA: 'false'
       EUREKA_CLIENT_FETCH_REGISTRY: 'false'
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
+      test: [ "CMD", "curl", "-f", "http://localhost:8761/actuator/health" ]
       interval: 15s
       timeout: 10s
       retries: 8
@@ -162,20 +162,24 @@ services:
       context: ./Backend/api-gateway
       dockerfile: Dockerfile
     container_name: api-gateway
-    networks: [unisystem-net]
+    networks: [ unisystem-net ]
     ports:
       - "8080:8080"
     depends_on:
       eureka-server:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     environment:
       SPRING_APPLICATION_NAME: api-gateway
       SERVER_PORT: 8080
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka
       EUREKA_INSTANCE_PREFER_IP_ADDRESS: 'true'
-      JWT_SECRET: ${JWT_SECRET:-mySuperSecretKey2026UniSystemXYZ!}
+      JWT_SECRET: ${JWT_SECRET}
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
       interval: 15s
       timeout: 10s
       retries: 5
@@ -189,13 +193,11 @@ services:
       context: ./Backend/iam-service
       dockerfile: Dockerfile
     container_name: iam-service
-    networks: [unisystem-net]
+    networks: [ unisystem-net ]
     ports:
       - "8081:8081"
     depends_on:
       shared-db:
-        condition: service_healthy
-      kafka:
         condition: service_healthy
       eureka-server:
         condition: service_healthy
@@ -206,14 +208,13 @@ services:
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: "01125867988"
       SPRING_JPA_HIBERNATE_DDL_AUTO: validate
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
-      SPRING_KAFKA_CONSUMER_GROUP_ID: iam-group
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka
       EUREKA_INSTANCE_PREFER_IP_ADDRESS: 'true'
-      JWT_SECRET: ${JWT_SECRET:-mySuperSecretKey2026UniSystemXYZ!}
+      SPRING_FLYWAY_ENABLED: "true"
+      JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRATION_MS: 86400000
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
+      test: [ "CMD", "curl", "-f", "http://localhost:8081/actuator/health" ]
       interval: 15s
       timeout: 10s
       retries: 8
@@ -227,7 +228,7 @@ services:
       context: ./Backend/academic-core-Service
       dockerfile: Dockerfile
     container_name: academic-core
-    networks: [unisystem-net]
+    networks: [ unisystem-net ]
     ports:
       - "8082:8082"
     depends_on:
@@ -252,7 +253,7 @@ services:
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka
       EUREKA_INSTANCE_PREFER_IP_ADDRESS: 'true'
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8082/actuator/health"]
+      test: [ "CMD", "curl", "-f", "http://localhost:8082/actuator/health" ]
       interval: 15s
       timeout: 10s
       retries: 8
@@ -262,12 +263,12 @@ services:
   # ══════════════════════════════════════════
 
   communication-service:
-    profiles: ["full"]
+    profiles: [ "full" ]
     build:
       context: ./Backend/communication-service
       dockerfile: Dockerfile
     container_name: communication-service
-    networks: [unisystem-net]
+    networks: [ unisystem-net ]
     ports:
       - "8083:8083"
     depends_on:
@@ -289,7 +290,7 @@ services:
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka
       EUREKA_INSTANCE_PREFER_IP_ADDRESS: 'true'
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8083/actuator/health"]
+      test: [ "CMD", "curl", "-f", "http://localhost:8083/actuator/health" ]
       interval: 15s
       timeout: 10s
       retries: 8
@@ -299,14 +300,14 @@ services:
   # ══════════════════════════════════════════
 
   frontend:
-    profiles: ["full"]
+    profiles: [ "full" ]
     build:
       context: ./FrontEnd/my-app
       dockerfile: Dockerfile
       args:
         VITE_API_BASE_URL: http://localhost:8080
     container_name: frontend
-    networks: [unisystem-net]
+    networks: [ unisystem-net ]
     ports:
       - "5173:4173"
     depends_on:

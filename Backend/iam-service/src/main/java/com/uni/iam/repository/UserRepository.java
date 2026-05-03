@@ -29,16 +29,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
     /** All users with a specific role (STUDENT | TEACHER | ADMIN). */
     List<User> findAllByRole(Role role);
 
-    /**
-     * Fetch multiple users by a list of IDs in a single query.
-     * Used after resolving user IDs from the enrollment table.
-     */
-    List<User> findByIdIn(List<Long> ids);
-
-    /**
-     * Fetch all users enrolled in a given course.
-     * Joins through CourseEnrollment so we avoid loading all enrollments first.
-     */
-    @Query("SELECT u FROM User u JOIN CourseEnrollment ce ON ce.user.id = u.id WHERE ce.courseId = :courseId")
-    List<User> findAllByCourseId(@Param("courseId") Long courseId);
 }

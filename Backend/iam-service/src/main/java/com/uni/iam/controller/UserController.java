@@ -1,8 +1,6 @@
 package com.uni.iam.controller;
 
-import com.uni.iam.dto.request.CourseEnrollmentRequest;
 import com.uni.iam.dto.request.UpdateUserRequest;
-import com.uni.iam.dto.response.CourseUsersResponse;
 import com.uni.iam.dto.response.StudentResponse;
 import com.uni.iam.dto.response.TeacherResponse;
 import com.uni.iam.dto.response.UserResponse;
@@ -13,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,7 +24,7 @@ import java.util.List;
  *
  * Role conventions enforced via @PreAuthorize:
  *   ROLE_ADMIN   — full access
- *   ROLE_TEACHER — read students + course views
+ *   ROLE_TEACHER — read students
  *   ROLE_STUDENT — read/update own profile only
  *
  * NO business logic lives here — only HTTP concerns.
@@ -38,12 +37,22 @@ public class UserController {
     private final UserService userService;
 
     // ════════════════════════════════════════════════════════════
+    // GET  /api/users/me
+    // Returns the currently authenticated user's profile.
+    // ════════════════════════════════════════════════════════════
+    @GetMapping("/me")
+    public ResponseEntity<UserResponse> getCurrentUser(Authentication authentication) {
+        String username = authentication.getName();
+        return ResponseEntity.ok(userService.getUserByUsername(username));
+    }
+
+    // ════════════════════════════════════════════════════════════
     // GET  /api/users/{id}
     // Returns any user by primary key.
-    // ADMIN sees all; others may only see their own (enforced downstream).
+    // ADMIN sees all.
     // ════════════════════════════════════════════════════════════
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getUserById(id));
     }
@@ -79,14 +88,14 @@ public class UserController {
     }
 
     // ════════════════════════════════════════════════════════════
-    // GET  /api/users/students?department=CS
-    // Filter students by department.
+    // GET  /api/users/students/department/{depId}
+    // Filter students by department ID.
     // ════════════════════════════════════════════════════════════
-    @GetMapping("/students/department/{department}")
+    @GetMapping("/students/department/{depId}")
     @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
-    public ResponseEntity<List<StudentResponse>> getStudentsByDepartment(
-            @PathVariable String department) {
-        return ResponseEntity.ok(userService.getStudentsByDepartment(department));
+    public ResponseEntity<List<StudentResponse>> getStudentsByDepId(
+            @PathVariable Long depId) {
+        return ResponseEntity.ok(userService.getStudentsByDepId(depId));
     }
 
     // ════════════════════════════════════════════════════════════
@@ -109,15 +118,7 @@ public class UserController {
         return ResponseEntity.ok(userService.getAllTeachers());
     }
 
-    // ════════════════════════════════════════════════════════════
-    // GET  /api/users/teachers/faculty/{faculty}
-    // Filter teachers by faculty.
-    // ════════════════════════════════════════════════════════════
-    @GetMapping("/teachers/faculty/{faculty}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<TeacherResponse>> getTeachersByFaculty(@PathVariable String faculty) {
-        return ResponseEntity.ok(userService.getTeachersByFaculty(faculty));
-    }
+
 
     // ════════════════════════════════════════════════════════════
     // PUT  /api/users/{id}
@@ -125,7 +126,7 @@ public class UserController {
     // ADMIN can update anyone; users can update themselves.
     // ════════════════════════════════════════════════════════════
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
+    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.username")
     public ResponseEntity<UserResponse> updateUser(
             @PathVariable Long id,
             @Valid @RequestBody UpdateUserRequest request) {
@@ -143,52 +144,5 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    // ════════════════════════════════════════════════════════════
-    // COURSE ENROLLMENT
-    // ════════════════════════════════════════════════════════════
 
-    /**
-     * POST  /api/users/enroll
-     * Enroll a user in a course.
-     */
-    @PostMapping("/enroll")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> enrollUserInCourse(
-            @Valid @RequestBody CourseEnrollmentRequest request) {
-        userService.enrollUserInCourse(request);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
-    }
-
-    /**
-     * DELETE  /api/users/{userId}/courses/{courseId}
-     * Remove a user from a course.
-     */
-    @DeleteMapping("/{userId}/courses/{courseId}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> removeUserFromCourse(
-            @PathVariable Long userId,
-            @PathVariable Long courseId) {
-        userService.removeUserFromCourse(userId, courseId);
-        return ResponseEntity.noContent().build();
-    }
-
-    /**
-     * GET  /api/users/course/{courseId}
-     * Get all users (any type) enrolled in a given course.
-     */
-    @GetMapping("/course/{courseId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
-    public ResponseEntity<CourseUsersResponse> getUsersByCourse(@PathVariable Long courseId) {
-        return ResponseEntity.ok(userService.getUsersByCourse(courseId));
-    }
-
-    /**
-     * GET  /api/users/{userId}/courses
-     * List all course IDs a user is enrolled in.
-     */
-    @GetMapping("/{userId}/courses")
-    @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.id")
-    public ResponseEntity<List<Long>> getUserCourses(@PathVariable Long userId) {
-        return ResponseEntity.ok(userService.getUserCourses(userId));
-    }
 }

@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -38,8 +39,19 @@ public class AuthController {
      * Returns 201 Created + JWT on success.
      */
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
-        AuthResponse response = authService.register(request);
+    public ResponseEntity<AuthResponse> register(
+            @Valid @RequestBody RegisterRequest request,
+            Authentication authentication
+    ) {
+        String currentRole = null;
+        if (authentication != null && authentication.getAuthorities() != null) {
+            currentRole = authentication.getAuthorities().stream()
+                    .map(a -> a.getAuthority())
+                    .findFirst()
+                    .orElse(null);
+        }
+        
+        AuthResponse response = authService.register(request, currentRole);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -50,6 +62,19 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         AuthResponse response = authService.login(request);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Refresh an existing, valid JWT.
+     */
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthResponse> refresh(@RequestHeader("Authorization") String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+        String token = authHeader.substring(7);
+        AuthResponse response = authService.refresh(token);
         return ResponseEntity.ok(response);
     }
 }

@@ -1,17 +1,16 @@
 -- ============================================================
 -- V3 — Add Admin Table and Fix Data
--- MySQL-compatible version
 -- ============================================================
 
 -- 1. Create the dedicated admins table (JOINED inheritance)
 CREATE TABLE IF NOT EXISTS admins (
-    id          BIGINT          NOT NULL,
+    id          BIGINT          PRIMARY KEY,
     admin_level VARCHAR(50),
-    PRIMARY KEY (id),
-    CONSTRAINT fk_admins_users FOREIGN KEY (id) REFERENCES users(id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    FOREIGN KEY (id) REFERENCES users(id) ON DELETE CASCADE
+);
 
 -- 2. Migrate existing admins that were accidentally saved as students
+-- Insert them into the new admins table
 INSERT INTO admins (id)
 SELECT u.id FROM users u WHERE u.role = 'ADMIN' AND u.user_type = 'STUDENT';
 

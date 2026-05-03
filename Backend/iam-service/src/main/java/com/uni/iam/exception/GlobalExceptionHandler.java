@@ -19,7 +19,6 @@ import java.util.Map;
  *
  * Handled exceptions:
  *   UserAlreadyExistsException  → 409 Conflict
- *   AlreadyEnrolledException    → 409 Conflict
  *   UserNotFoundException        → 404 Not Found
  *   BadCredentialsException      → 401 Unauthorized
  *   MethodArgumentNotValidException → 400 Bad Request
@@ -35,12 +34,7 @@ public class GlobalExceptionHandler {
                 .body(new ErrorResponse(HttpStatus.CONFLICT.value(), ex.getMessage()));
     }
 
-    // ── 409 Conflict: user already enrolled in course ──
-    @ExceptionHandler(AlreadyEnrolledException.class)
-    public ResponseEntity<ErrorResponse> handleAlreadyEnrolled(AlreadyEnrolledException ex) {
-        return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(new ErrorResponse(HttpStatus.CONFLICT.value(), ex.getMessage()));
-    }
+
 
     // ── 404 Not Found: user not found by ID / username / email ──
     @ExceptionHandler(UserNotFoundException.class)
@@ -70,17 +64,9 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(body);
     }
 
-    // ── 403 Forbidden: insufficient permissions ──
-    @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
-    public ResponseEntity<ErrorResponse> handleAccessDenied(org.springframework.security.access.AccessDeniedException ex) {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                .body(new ErrorResponse(HttpStatus.FORBIDDEN.value(), "Access is denied: insufficient privileges"));
-    }
-
     // ── 500 fallback ──
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGeneral(Exception ex) {
-        ex.printStackTrace();
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ErrorResponse(500, "An unexpected error occurred"));
     }
