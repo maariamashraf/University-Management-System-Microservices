@@ -21,7 +21,7 @@ public class CourseController {
 
     @TeachersOnly
     @AuditLog(action = "CREATE_COURSE")
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<Course> createCourse(@RequestBody CreateCourseUseCase.CreateCourseCommand command) {
         Course course = createCourseUseCase.create(command);
         return ResponseEntity.ok(course);
