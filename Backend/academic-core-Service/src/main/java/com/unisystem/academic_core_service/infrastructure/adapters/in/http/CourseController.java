@@ -40,6 +40,14 @@ public class CourseController {
         List<Course> courses = getCoursesQuery.findAll();
         return ResponseEntity.ok(courses);
     }
+
+    @GetMapping("/popular")
+    public ResponseEntity<List<Course>> getPopularCourses(
+            @RequestParam(defaultValue = "8") int limit
+    ) {
+        int safeLimit = Math.max(1, Math.min(limit, 20));
+        return ResponseEntity.ok(getCoursesQuery.findPopular(safeLimit));
+    }
     
     @GetMapping("/teacher/name/{teacherName}")
 

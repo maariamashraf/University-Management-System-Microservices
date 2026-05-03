@@ -32,6 +32,6 @@ CREATE TABLE IF NOT EXISTS teachers (
 );
 
 -- Indexes for common lookups
-CREATE INDEX IF NOT EXISTS idx_users_role      ON users(role);
-CREATE INDEX IF NOT EXISTS idx_users_user_type ON users(user_type);
-CREATE INDEX IF NOT EXISTS idx_students_dep_id ON students(dep_id);
+CREATE INDEX idx_users_role      ON users(role);
+CREATE INDEX idx_users_user_type ON users(user_type);
+CREATE INDEX idx_students_dep_id ON students(dep_id);

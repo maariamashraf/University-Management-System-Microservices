@@ -31,7 +31,10 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
     // belongs to downstream services, not the gateway
     private static final List<String> PUBLIC = List.of(
         "/api/auth/login",
-        "/api/auth/register"
+        "/api/auth/register",
+        "/api/courses/popular",
+        "/api/departments/all",
+        "/api/feedbacks/recent"
     );
 
     @Override

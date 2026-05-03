@@ -113,11 +113,11 @@ services:
   # ══════════════════════════════════════════
 
   shared-db:
-    image: mysql:8.0
+    image: mysql:8.0.33
     container_name: shared-db
     networks: [ unisystem-net ]
     ports:
-      - "3306:3306" # same port as localhost:3306 your team uses locally
+      - "3307:3306" # keep host 3306 free for local MySQL
     environment:
       MYSQL_ROOT_PASSWORD: "01125867988"
       MYSQL_DATABASE: helwanuni
@@ -210,6 +210,8 @@ services:
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka
       EUREKA_INSTANCE_PREFER_IP_ADDRESS: 'true'
       SPRING_FLYWAY_ENABLED: "true"
+      SPRING_FLYWAY_BASELINE_ON_MIGRATE: "true"
+      SPRING_FLYWAY_BASELINE_VERSION: "0"
       JWT_SECRET: ${JWT_SECRET:-local-development-secret-change-me-minimum-thirty-two-char}
       JWT_EXPIRATION_MS: 86400000
     healthcheck:

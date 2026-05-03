@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Comparator;
 import java.util.List;
 
 @RestController
@@ -30,6 +31,15 @@ public class FeedbackController {
     @GetMapping
     public ResponseEntity<List<GetFeedBackQuery.FeedbackDTO>> getAllFeedbacks() {
         return ResponseEntity.ok(getFeedBackQuery.getAllFeedbacks());
+    }
+
+    @GetMapping("/recent")
+    public ResponseEntity<List<GetFeedBackQuery.FeedbackDTO>> getRecentFeedbacks() {
+        List<GetFeedBackQuery.FeedbackDTO> recent = getFeedBackQuery.getAllFeedbacks().stream()
+                .sorted(Comparator.comparing(GetFeedBackQuery.FeedbackDTO::createdAt).reversed())
+                .limit(6)
+                .toList();
+        return ResponseEntity.ok(recent);
     }
 
     @GetMapping("/{id}")

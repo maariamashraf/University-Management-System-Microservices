@@ -4,12 +4,12 @@ import jakarta.persistence.*;
 import lombok.*;
 
 /**
- * Stub — maps to the shared "enrolled_courses" table.
+ * Stub — maps to the shared "enrollments" table.
  * Used to fan-out notifications to all students enrolled in a course.
  * Read-only from this service's perspective.
  */
 @Entity
-@Table(name = "enrolled_courses")
+@Table(name = "enrollments")
 @Getter
 @Setter
 @NoArgsConstructor
