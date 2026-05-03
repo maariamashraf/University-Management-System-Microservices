@@ -65,7 +65,7 @@ The `docker-compose.yml` file provides orchestration for the following:
 
 | Issue | Problem | Fix |
 |--------|---------|-----|
-| **Naming typos** | e.g. `StudentEnrollend`, `kafkaConifg`. | Rename with care if topics/events are public. |
+| **Naming typos--DONE✅** | e.g. `StudentEnrollend`, `kafkaConifg`. | Rename with care if topics/events are public. |
 
 ---
 
@@ -73,7 +73,7 @@ The `docker-compose.yml` file provides orchestration for the following:
 
 #### Critical
 
-- Same as **Kafka topic inconsistency** (section 1).
+- Same as **Kafka topic inconsistency--DONE✅** (section 1).
 
 #### High
 
@@ -205,7 +205,7 @@ Useful skeleton: **Gateway + JWT filter**, **Eureka**, **Redis cache**, **Kafka 
 ### Prioritized action plan
 
 1. **Unify HTTP contracts** — Gateway predicates, controllers, frontend (especially enrollments vs enrolled-courses, users vs students/teachers).
-2. **Fix Kafka** — One topic naming convention; align **kafka-init**, `NewTopic`, producers, consumers; fix **payload shapes**.
+2. **Fix Kafka** — ✅One topic naming convention; ❌align **kafka-init**, `NewTopic`, producers, consumers; ❌fix **payload shapes**.
 3. **Harden services** — JWT (or equivalent) beyond gateway for every internet-facing hop; eliminate **permitAll** in integrated profiles.
 4. **Clarify data ownership** — Shared DB documented or split; consistent Flyway/DDL strategy.
 5. **Errors & audits** — Global handlers; real audit persistence/API if admin features require it.
