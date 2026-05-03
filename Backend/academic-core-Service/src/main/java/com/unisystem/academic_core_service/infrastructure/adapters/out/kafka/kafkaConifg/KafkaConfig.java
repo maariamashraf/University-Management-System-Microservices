@@ -15,15 +15,16 @@ public class KafkaConfig {
               .build();
   }
 
-    @Bean
-    public NewTopic gradeSubmittedTopic() {
-        return TopicBuilder.name(KafkaTopics.GRADE_SUBMITTED)
-               .build();
-    }
 
     @Bean
     public NewTopic courseCreatedTopic() {
         return TopicBuilder.name(KafkaTopics.COURSE_CREATED)
+                .build();
+    }
+
+    @Bean
+    public NewTopic announcementCreatedTopic() {
+        return TopicBuilder.name(KafkaTopics.ANNOUNCEMENT_CREATED)
                 .build();
     }
 
