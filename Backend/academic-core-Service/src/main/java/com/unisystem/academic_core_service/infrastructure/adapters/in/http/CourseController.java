@@ -2,7 +2,10 @@ package com.unisystem.academic_core_service.infrastructure.adapters.in.http;
 
 import com.unisystem.academic_core_service.domain.application.port.in.CreateCourseUseCase;
 import com.unisystem.academic_core_service.domain.application.port.in.GetCoursesQuery;
+import com.unisystem.academic_core_service.domain.exceptions.CourseNotFoundException;
 import com.unisystem.academic_core_service.domain.model.Course;
+import com.unisystem.academic_core_service.infrastructure.aop.annotations.AuditLog;
+import com.unisystem.academic_core_service.infrastructure.aop.annotations.TeachersOnly;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +20,9 @@ public class CourseController {
     private final CreateCourseUseCase createCourseUseCase;
     private final GetCoursesQuery getCoursesQuery;
 
-    @PostMapping("/create")
+    @TeachersOnly
+    @AuditLog(action = "CREATE_COURSE")
+    @PostMapping
     public ResponseEntity<Course> createCourse(@RequestBody CreateCourseUseCase.CreateCourseCommand command) {
         Course course = createCourseUseCase.create(command);
         return ResponseEntity.ok(course);
@@ -26,7 +31,7 @@ public class CourseController {
     @GetMapping("/{id}")
     public ResponseEntity<Course> getCourseById(@PathVariable Long id) {
          Course course=getCoursesQuery.findById(id)
-                .orElseThrow(() -> new RuntimeException("Course not found"));
+                .orElseThrow(() -> new CourseNotFoundException(id));
         return ResponseEntity.ok(course);
     }
 
@@ -36,7 +41,8 @@ public class CourseController {
         return ResponseEntity.ok(courses);
     }
     
-    @GetMapping("/teacher/{teacherName}")
+    @GetMapping("/teacher/name/{teacherName}")
+
     public ResponseEntity<List<Course>> getCoursesByTeacherName(@PathVariable String teacherName) {
         List<Course> courses = getCoursesQuery.findByTeacherName(teacherName);
         return ResponseEntity.ok(courses);

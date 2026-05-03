@@ -4,6 +4,7 @@ import com.unisystem.academic_core_service.domain.application.port.in.CreateCour
 import com.unisystem.academic_core_service.domain.application.port.out.CourseRepositoryPort;
 import com.unisystem.academic_core_service.domain.application.port.out.EventPublisherPort;
 import com.unisystem.academic_core_service.domain.events.CourseCreatedEvent;
+import com.unisystem.academic_core_service.domain.exceptions.DuplicateCourseException;
 import com.unisystem.academic_core_service.domain.model.Course;
 import com.unisystem.academic_core_service.infrastructure.config.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
@@ -34,11 +35,11 @@ public class CreateCourseService implements CreateCourseUseCase {
     public Course create(CreateCourseCommand cmd) {
         Boolean exists = courseRepository.existsByCourseCode(cmd.courseCode());
         if (exists) {
-            throw new RuntimeException("Course code already exists");
+            throw new DuplicateCourseException(cmd.courseCode());
         }
 
         if (cmd.startDate() != null && cmd.endDate() != null && cmd.endDate().isBefore(cmd.startDate())) {
-            throw new RuntimeException("End date cannot be before start date");
+            throw new IllegalArgumentException("End date cannot be before start date");
         }
 
         Course course = new Course();
