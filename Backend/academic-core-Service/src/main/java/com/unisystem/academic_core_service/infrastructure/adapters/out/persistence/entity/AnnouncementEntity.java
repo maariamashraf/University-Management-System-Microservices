@@ -31,7 +31,7 @@ public class AnnouncementEntity {
     @Column(nullable = false)
     private String title;
 
-    @Column(columnDefinition = "TEXT", nullable = false)
+    @Column(name = "description", columnDefinition = "TEXT", nullable = false)
     private String content;
 
     @Column(name = "course_id", nullable = false)

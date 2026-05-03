@@ -20,6 +20,8 @@ RUN mvn clean package -DskipTests -q
 # ─────────────────────────────────────────────────────────────
 FROM eclipse-temurin:17-jre-alpine
 
+RUN apk add --no-cache curl
+
 WORKDIR /app
 
 # Copy only the fat JAR from the builder stage

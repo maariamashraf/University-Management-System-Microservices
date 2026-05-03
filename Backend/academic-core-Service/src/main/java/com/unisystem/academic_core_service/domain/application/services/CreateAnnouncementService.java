@@ -7,6 +7,7 @@ import com.unisystem.academic_core_service.domain.application.port.out.EventPubl
 import com.unisystem.academic_core_service.domain.events.AnnouncementCreatedEvent;
 import com.unisystem.academic_core_service.domain.exceptions.CourseNotFoundException;
 import com.unisystem.academic_core_service.domain.model.Announcement;
+import com.unisystem.academic_core_service.domain.model.Course;
 
 import java.time.LocalDateTime;
 
@@ -29,9 +30,11 @@ public class CreateAnnouncementService implements CreateAnnouncementUseCase {
     @Override
 
     public Announcement create(CreateAnnouncementCommand command) {
-        if (command.courseId() == null || courseRepository.findById(command.courseId()).isEmpty()) {
-            throw new CourseNotFoundException(command.courseId());
+        if (command.courseId() == null) {
+            throw new CourseNotFoundException("Course id is required");
         }
+        Course course = courseRepository.findById(command.courseId())
+                .orElseThrow(() -> new CourseNotFoundException(command.courseId()));
 
         Announcement announcement = new Announcement();
         announcement.setTitle(command.title());
@@ -44,6 +47,9 @@ public class CreateAnnouncementService implements CreateAnnouncementUseCase {
         AnnouncementCreatedEvent event = new AnnouncementCreatedEvent(
                 savedAnnouncement.getId().toString(),
                 savedAnnouncement.getCourseId().toString(),
+                course.getName() != null ? course.getName() : "",
+                savedAnnouncement.getTitle(),
+                savedAnnouncement.getContent(),
                 savedAnnouncement.getCreatedAt()
         );
         eventPublisher.publishAnnouncementCreated(event);

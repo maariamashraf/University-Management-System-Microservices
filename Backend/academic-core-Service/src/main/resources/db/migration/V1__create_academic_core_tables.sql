@@ -1,10 +1,10 @@
--- 1. department (no dependencies)
+-- Academic core schema (IAM users/teachers exist separately; no FK to users here).
+
 CREATE TABLE IF NOT EXISTS department (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     dep_name VARCHAR(255) UNIQUE NOT NULL
 );
 
--- 2. teacher_department (depends on department)
 CREATE TABLE IF NOT EXISTS teacher_department (
     teacher_id BIGINT NOT NULL COMMENT 'IAM service cross-reference, NO FK CONSTRAINT',
     dep_id BIGINT NOT NULL,
@@ -13,7 +13,6 @@ CREATE TABLE IF NOT EXISTS teacher_department (
     INDEX idx_teacher_id (teacher_id)
 );
 
--- 3. courses (depends on department)
 CREATE TABLE IF NOT EXISTS courses (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     course_name VARCHAR(255),
@@ -26,7 +25,6 @@ CREATE TABLE IF NOT EXISTS courses (
     INDEX idx_course_dep (course_dep)
 );
 
--- 4. course_prerequisites (depends on courses)
 CREATE TABLE IF NOT EXISTS course_prerequisites (
     course_id BIGINT NOT NULL,
     course_prerequisite BIGINT NOT NULL,
@@ -35,7 +33,6 @@ CREATE TABLE IF NOT EXISTS course_prerequisites (
     CONSTRAINT fk_prereq_prerequisite FOREIGN KEY (course_prerequisite) REFERENCES courses(id) ON DELETE CASCADE
 );
 
--- 5. enrolled_courses (depends on courses)
 CREATE TABLE IF NOT EXISTS enrolled_courses (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     student_id BIGINT NOT NULL COMMENT 'IAM service cross-reference, NO FK CONSTRAINT',
@@ -46,7 +43,6 @@ CREATE TABLE IF NOT EXISTS enrolled_courses (
     INDEX idx_student_id (student_id)
 );
 
--- 6. audit_logs (standalone)
 CREATE TABLE IF NOT EXISTS audit_logs (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NULL COMMENT 'IAM service cross-reference, NO FK CONSTRAINT. NULL allowed for system-triggered actions',
@@ -58,7 +54,6 @@ CREATE TABLE IF NOT EXISTS audit_logs (
     INDEX idx_action (action)
 );
 
--- 7. announcements (depends on courses)
 CREATE TABLE IF NOT EXISTS announcements (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
@@ -69,7 +64,6 @@ CREATE TABLE IF NOT EXISTS announcements (
     INDEX idx_course_id (course_id)
 );
 
--- 8. feedback (no dependencies, cross-service reference only)
 CREATE TABLE IF NOT EXISTS feedback (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NOT NULL COMMENT 'IAM service cross-reference, NO FK CONSTRAINT',

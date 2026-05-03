@@ -40,7 +40,11 @@ public class EnrollStudentService  implements EnrollStudentUseCase {
         Enrollment enrollment = Enrollment.create(cmd.studentId(), cmd.courseId());
         enrollmentRepositoryPort.save(enrollment);
 
-        StudentEnrollend event = new StudentEnrollend(cmd.studentId().toString(), cmd.courseId().toString());
+        StudentEnrollend event = new StudentEnrollend(
+                cmd.studentId().toString(),
+                cmd.courseId().toString(),
+                course.getName() != null ? course.getName() : ""
+        );
         eventPublisherPort.publishStudentEnrolled(event);
         return enrollment;
     }

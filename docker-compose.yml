@@ -66,18 +66,17 @@ services:
       kafka:
         condition: service_healthy
     entrypoint: [ "/bin/sh", "-c" ]
-    command: |
-      "
-      echo 'Waiting for Kafka...'
-      sleep 5
-      
-      kafka-topics --create --if-not-exists --topic student-enrolled --bootstrap-server kafka:29092 --partitions 1 --replication-factor 1
-      kafka-topics --create --if-not-exists --topic announcement-created --bootstrap-server kafka:29092 --partitions 1 --replication-factor 1
-      kafka-topics --create --if-not-exists --topic course-created --bootstrap-server kafka:29092 --partitions 1 --replication-factor 1
-      kafka-topics --create --if-not-exists --topic notification-push --bootstrap-server kafka:29092 --partitions 1 --replication-factor 1
-      echo 'Topics created:'
-      kafka-topics --list --bootstrap-server kafka:29092
-      "
+    command:
+      - |
+        set -e
+        echo 'Waiting for Kafka...'
+        sleep 5
+        kafka-topics --create --if-not-exists --topic student-enrolled --bootstrap-server kafka:29092 --partitions 1 --replication-factor 1
+        kafka-topics --create --if-not-exists --topic announcement-created --bootstrap-server kafka:29092 --partitions 1 --replication-factor 1
+        kafka-topics --create --if-not-exists --topic course-created --bootstrap-server kafka:29092 --partitions 1 --replication-factor 1
+        kafka-topics --create --if-not-exists --topic notification-push --bootstrap-server kafka:29092 --partitions 1 --replication-factor 1
+        echo 'Topics created:'
+        kafka-topics --list --bootstrap-server kafka:29092
     restart: on-failure
 
   kafka-ui:
@@ -175,7 +174,7 @@ services:
       SERVER_PORT: 8080
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka
       EUREKA_INSTANCE_PREFER_IP_ADDRESS: 'true'
-      JWT_SECRET: ${JWT_SECRET}
+      JWT_SECRET: ${JWT_SECRET:-local-development-secret-change-me-minimum-thirty-two-char}
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_REDIS_PORT: 6379
     healthcheck:
@@ -211,7 +210,7 @@ services:
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka
       EUREKA_INSTANCE_PREFER_IP_ADDRESS: 'true'
       SPRING_FLYWAY_ENABLED: "true"
-      JWT_SECRET: ${JWT_SECRET}
+      JWT_SECRET: ${JWT_SECRET:-local-development-secret-change-me-minimum-thirty-two-char}
       JWT_EXPIRATION_MS: 86400000
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8081/actuator/health" ]
@@ -263,7 +262,6 @@ services:
   # ══════════════════════════════════════════
 
   communication-service:
-    profiles: [ "full" ]
     build:
       context: ./Backend/communication-service
       dockerfile: Dockerfile
@@ -278,6 +276,10 @@ services:
         condition: service_healthy
       eureka-server:
         condition: service_healthy
+      iam-service:
+        condition: service_healthy
+      academic-core:
+        condition: service_healthy
     environment:
       SPRING_APPLICATION_NAME: communication-service
       SERVER_PORT: 8083
@@ -287,6 +289,8 @@ services:
       SPRING_JPA_HIBERNATE_DDL_AUTO: validate
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       SPRING_KAFKA_CONSUMER_GROUP_ID: communication-group
+      SPRING_FLYWAY_ENABLED: 'true'
+      JWT_SECRET: ${JWT_SECRET:-local-development-secret-change-me-minimum-thirty-two-char}
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka
       EUREKA_INSTANCE_PREFER_IP_ADDRESS: 'true'
     healthcheck:
@@ -300,7 +304,6 @@ services:
   # ══════════════════════════════════════════
 
   frontend:
-    profiles: [ "full" ]
     build:
       context: ./FrontEnd/my-app
       dockerfile: Dockerfile

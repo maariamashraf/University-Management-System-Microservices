@@ -1,6 +1,4 @@
--- V8__addCommunicationServiceTables.sql
--- Communication Service DB migration
--- Matches the project's existing Flyway migration pattern
+-- Requires IAM users table and academic courses table (run IAM + academic-core first).
 
 CREATE TABLE IF NOT EXISTS notifications (
     id          BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -34,7 +32,6 @@ CREATE TABLE IF NOT EXISTS messages (
         ON DELETE CASCADE
 );
 
--- Indexes for faster lookups
 CREATE INDEX idx_notifications_user_id  ON notifications(user_id);
 CREATE INDEX idx_notifications_is_read  ON notifications(user_id, is_read);
 CREATE INDEX idx_notifications_type     ON notifications(user_id, type);
