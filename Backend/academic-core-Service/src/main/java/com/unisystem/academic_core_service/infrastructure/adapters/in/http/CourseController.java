@@ -40,7 +40,8 @@ public class CourseController {
         return ResponseEntity.ok(courses);
     }
     
-    @GetMapping("/teacher/{teacherName}")
+    @GetMapping("/teacher/name/{teacherName}")
+
     public ResponseEntity<List<Course>> getCoursesByTeacherName(@PathVariable String teacherName) {
         List<Course> courses = getCoursesQuery.findByTeacherName(teacherName);
         return ResponseEntity.ok(courses);
