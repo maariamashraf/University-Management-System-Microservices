@@ -6,16 +6,16 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.serializer.GenericJacksonJsonRedisSerializer;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
-import tools.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.time.Duration;
 import java.util.Set;
 
 @Configuration
 public class CacheConfig {
-
+        
     public static final String ANNOUNCEMENTS_BY_COURSE_CACHE = "announcementsByCourse";
     public static final String COURSES_ALL_CACHE = "coursesAll";
     public static final String COURSES_BY_ID_CACHE = "coursesById";
@@ -40,7 +40,7 @@ public class CacheConfig {
                 .entryTtl(Duration.ofMinutes(10))
                 .serializeValuesWith(
                         RedisSerializationContext.SerializationPair.fromSerializer(
-                                new GenericJacksonJsonRedisSerializer(new ObjectMapper())
+                                new GenericJackson2JsonRedisSerializer(new ObjectMapper())
                         )
                 );
 

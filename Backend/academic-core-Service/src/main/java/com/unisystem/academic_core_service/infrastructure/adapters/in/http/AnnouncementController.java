@@ -5,6 +5,8 @@ import com.unisystem.academic_core_service.domain.application.port.in.GetAnnounc
 import com.unisystem.academic_core_service.domain.model.Announcement;
 import com.unisystem.academic_core_service.infrastructure.adapters.in.http.Dto.Request.CreateAnnouncementRequest;
 import com.unisystem.academic_core_service.infrastructure.adapters.in.http.Dto.Response.AnnouncementResponse;
+import com.unisystem.academic_core_service.infrastructure.aop.annotations.AuditLog;
+import com.unisystem.academic_core_service.infrastructure.aop.annotations.TeachersOnly;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +26,8 @@ public class AnnouncementController {
     private final CreateAnnouncementUseCase createAnnouncementUseCase;
     private final GetAnnouncementsQuery getAnnouncementsQuery;
 
+    @TeachersOnly
+    @AuditLog(action = "CREATE_ANNOUNCEMENT")
     @PostMapping
     public ResponseEntity<AnnouncementResponse> createAnnouncement(@RequestBody CreateAnnouncementRequest request) {
         Announcement savedAnnouncement = createAnnouncementUseCase.create(
