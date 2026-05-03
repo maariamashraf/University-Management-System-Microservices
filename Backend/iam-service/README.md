@@ -34,14 +34,16 @@ This microservice handles user identities, authentication, authorization, and ba
 
 ## 🛠 Tech Stack
 
-- **Java 17**
-- **Spring Boot 3.2.0**
+- **Java 17 (or 21)**
+- **Spring Boot 3.3.4**
+- **Spring Cloud 2023.0.3**
 - **Spring Security + JJWT (0.11.5)** for security and token generation.
 - **Spring Data JPA / Hibernate** for Object-Relational Mapping.
-- **PostgreSQL** as the relational database.
+- **MySQL 8.0** as the relational database.
 - **Flyway** for database migrations.
-- **Spring Cloud Netflix Eureka** for service discovery (acts as a Eureka Client).
+- **Spring Cloud Netflix Eureka** for service discovery.
 - **Spring AOP** for aspect-oriented programming (logging).
+- **Spring Boot Actuator** for health checks.
 - **Lombok** to reduce Java boilerplate.
 
 ## 📁 Project Architecture
@@ -60,19 +62,21 @@ This microservice handles user identities, authentication, authorization, and ba
 ### Authentication
 | Method | Endpoint | Description | Access |
 |---|---|---|---|
-| POST | `/api/auth/register` | Register a new User (Student/Teacher/Admin) | Public |
-| POST | `/api/auth/login` | Authenticate and retrieve JWT | Public |
+| POST | `/api/auth/register` | Register a new User. **Note: ADMIN role requires existing ADMIN auth.** | Public* |
+| POST | `/api/auth/login` | Authenticate and retrieve JWT (returns `token`, `userId`, `username`) | Public |
+| POST | `/api/auth/refresh` | Renew an existing valid JWT | Authenticated |
 
 ### User Management
 | Method | Endpoint | Description | Access |
 |---|---|---|---|
-| GET | `/api/users/{id}` | Get user by ID | Admin, or Self |
-| GET | `/api/users` | Get all users | Admin |
+| GET | `/api/users/me` | Get currently authenticated user's profile | Authenticated |
+| GET | `/api/users/{id}` | Get user by ID | Admin Only |
+| GET | `/api/users` | Get all users | Admin Only |
 | GET | `/api/users/students` | Get all students | Admin, Teacher |
 | GET | `/api/users/students/department/{dept}` | Filter students by department | Admin, Teacher |
-| GET | `/api/users/teachers` | Get all teachers | Admin |
-| PUT | `/api/users/{id}` | Update a user's profile | Admin, or Self |
-| DELETE | `/api/users/{id}` | Delete a user | Admin |
+| GET | `/api/users/teachers` | Get all teachers | Admin Only |
+| PUT | `/api/users/{id}` | Update a user's profile | Admin Only |
+| DELETE | `/api/users/{id}` | Delete a user | Admin Only |
 
 ### Course Enrollment
 | Method | Endpoint | Description | Access |
@@ -80,22 +84,27 @@ This microservice handles user identities, authentication, authorization, and ba
 | POST | `/api/users/enroll` | Enroll a user in a course | Admin |
 | DELETE | `/api/users/{userId}/courses/{courseId}` | Remove user from a course | Admin |
 | GET | `/api/users/course/{courseId}` | Get all users enrolled in a course | Admin, Teacher |
-| GET | `/api/users/{userId}/courses` | Get all course IDs for a user | Admin, or Self |
+| GET | `/api/users/{userId}/courses` | Get all course IDs for a user | Admin Only |
+
+## 🛡 Security & Rate Limiting
+
+- **Rate Limiting**: Applied at the API Gateway level using Redis. Auth endpoints are limited to 10 requests/sec with a burst capacity of 20 to prevent brute-force attacks.
+- **JWT Secret**: Managed via environment variables (`JWT_SECRET`). Plaintext fallbacks are disabled for security.
+- **Admin Guard**: The system prevents unauthorized creation of Admin accounts by requiring an existing Admin to be authenticated for any `ROLE_ADMIN` registration request.
 
 ## ⚙️ Running Locally
 
 1. **Database Setup**: 
-   Ensure PostgreSQL is running locally on port `5432`.
+   Ensure MySQL is running locally on port `3306`.
    Create the database:
    ```sql
-   CREATE DATABASE iam_db;
+   CREATE DATABASE helwanuni;
    ```
 
-2. **Configuration**: 
-   Verify the credentials in `src/main/resources/application.properties`:
-   ```properties
-   spring.datasource.username=postgres
-   spring.datasource.password=postgres
+2. **Environment Variables**: 
+   Create a `.env` file in the root directory (or set env vars):
+   ```env
+   JWT_SECRET=your_super_secret_key_here
    ```
 
 3. **Start the Application**: 

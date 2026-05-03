@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -36,12 +37,22 @@ public class UserController {
     private final UserService userService;
 
     // ════════════════════════════════════════════════════════════
+    // GET  /api/users/me
+    // Returns the currently authenticated user's profile.
+    // ════════════════════════════════════════════════════════════
+    @GetMapping("/me")
+    public ResponseEntity<UserResponse> getCurrentUser(Authentication authentication) {
+        String username = authentication.getName();
+        return ResponseEntity.ok(userService.getUserByUsername(username));
+    }
+
+    // ════════════════════════════════════════════════════════════
     // GET  /api/users/{id}
     // Returns any user by primary key.
-    // ADMIN sees all; others may only see their own (enforced downstream).
+    // ADMIN sees all.
     // ════════════════════════════════════════════════════════════
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.username")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getUserById(id));
     }

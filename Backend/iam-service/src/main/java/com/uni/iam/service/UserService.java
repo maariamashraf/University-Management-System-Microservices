@@ -25,6 +25,9 @@ public interface UserService {
     /** Fetch a single user by primary key. Throws UserNotFoundException if absent. */
     UserResponse getUserById(Long id);
 
+    /** Fetch a single user by username. Throws UserNotFoundException if absent. */
+    UserResponse getUserByUsername(String username);
+
     /** Fetch all users regardless of type. */
     List<UserResponse> getAllUsers();
 

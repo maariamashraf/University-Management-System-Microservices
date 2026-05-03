@@ -33,17 +33,6 @@ public class LoggingAspect {
     public void serviceLayer() {}
 
     // ─────────────────────────────────────────────
-    // @Before — log method entry + args
-    // ─────────────────────────────────────────────
-
-    @Before("serviceLayer()")
-    public void logMethodEntry(JoinPoint jp) {
-        String method = jp.getSignature().toShortString();
-        Object[] args = jp.getArgs();
-        log.info("[AOP] ▶ Entering: {} | args: {}", method, Arrays.toString(args));
-    }
-
-    // ─────────────────────────────────────────────
     // @AfterReturning — log successful return
     // ─────────────────────────────────────────────
 

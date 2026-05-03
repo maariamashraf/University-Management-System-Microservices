@@ -4,8 +4,9 @@
 
 -- 1. Create the dedicated admins table (JOINED inheritance)
 CREATE TABLE IF NOT EXISTS admins (
-    id          BIGINT          PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
-    admin_level VARCHAR(50)
+    id          BIGINT          PRIMARY KEY,
+    admin_level VARCHAR(50),
+    FOREIGN KEY (id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 -- 2. Migrate existing admins that were accidentally saved as students
