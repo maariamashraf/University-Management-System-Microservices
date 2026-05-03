@@ -1,73 +1,58 @@
-# React + TypeScript + Vite
+# UniSystem Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Frontend application for the UniSystem project, built with React, TypeScript, and Vite.
 
-Currently, two official plugins are available:
+## Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- React 19
+- TypeScript 5
+- Vite 7
+- React Router DOM 7
+- TanStack Query 5
+- Axios
+- Chart.js
+- TailwindCSS 4
+- Framer Motion
+- Lucide React
 
-## React Compiler
+## Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Role-based dashboards for Student, Teacher, and Admin
+- Protected routes and authentication-aware navigation
+- Course browsing, enrollment, and management flows
+- Announcement and notification views with real-time updates
+- Audit log and admin analytics widgets
+- Reusable custom hooks and service-layer API abstraction
 
-## Expanding the ESLint configuration
+## Frontend Architecture
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- `src/components`: reusable UI blocks by domain (Dashboard, Courses, Auth, common)
+- `src/pages`: route-level screens
+- `src/CustomeHooks`: TanStack Query hooks and feature logic
+- `src/Services`: Axios-based API clients and auth helpers
+- `src/ContextsProviders`: shared app contexts (auth/dashboard)
+- `src/Interfaces`: TypeScript contracts for DTOs and view models
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Scripts
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev
+npm run build
+npm run preview
+npm run lint
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Environment
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Configure the frontend API target with Vite env vars:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+VITE_API_URL=http://localhost:8080
 ```
+
+## Notes
+
+- Data fetching is primarily handled by TanStack Query hooks.
+- HTTP communication is centralized through Axios service functions.
+- Routing and authorization behavior is handled via React Router and protected route components.

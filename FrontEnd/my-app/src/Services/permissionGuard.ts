@@ -13,7 +13,8 @@ const permissionRules: PermissionRule[] = [
     { method: "put", pattern: /\/api\/courses\/\d+$/, permission: "update_course" },
     { method: "delete", pattern: /\/api\/courses\/\d+$/, permission: "delete_course" },
     { method: "post", pattern: /\/api\/enrolled-courses$/, permission: "course_register" },
-    { method: "delete", pattern: /\/api\/enrolled-courses\/\d+$/, permission: "unenroll_student" },
+    { method: "delete", pattern: /\/api\/enrolled-courses\/teacher\/\d+$/, permission: "unenroll_student" },
+    { method: "delete", pattern: /\/api\/enrolled-courses\/student\/\d+$/, permission: "unenroll_course" },
     { method: "post", pattern: /\/api\/messages$/, permission: "send_message" },
     { method: "delete", pattern: /\/api\/messages\/\d+$/, permission: "send_message" },
 ];

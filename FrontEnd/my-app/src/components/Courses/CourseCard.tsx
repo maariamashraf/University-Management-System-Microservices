@@ -4,6 +4,7 @@ import { isCourseFull } from "../../Services/CourseService";
 import { DEPT_THEME, DEFAULT_THEME, DEPT_ICON, deptLabel, getCapacityPercent } from "../../Services/courseCardHelpers";
 import type { course } from "../../Interfaces/course";
 import type { EnrolledCourseResponse } from "../../Interfaces/enrolledCourse";
+import { getRole } from "../../Services/userService";
 
 
 export interface CourseCardProps {
@@ -22,7 +23,7 @@ export default function CourseCard({ course, enrollment, onEnroll, onDrop, isEnr
     const fillPct  = getCapacityPercent(course.enrolledStudents, course.maxStudents);
     const theme    = DEPT_THEME[course.department] ?? DEFAULT_THEME;
     const icon     = DEPT_ICON[course.department] ?? "📚";
-
+    const isTeacher = getRole() === "teacher";
     return (
         <motion.div
             initial={{ opacity: 0, y: 16 }}
@@ -127,13 +128,14 @@ export default function CourseCard({ course, enrollment, onEnroll, onDrop, isEnr
                     <button disabled className="w-full py-2.5 rounded-xl bg-gray-100 text-gray-400 font-semibold text-sm cursor-not-allowed">
                         Closed
                     </button>
-                ) : (
+                ) : !isTeacher && (
                     <motion.button
                         whileTap={{ scale: 0.97 }}
                         onClick={onEnroll}
                         disabled={isEnrolling}
                         className={`w-full py-2.5 rounded-xl bg-gradient-to-r ${theme.header} text-white font-semibold text-sm transition-opacity hover:opacity-90 disabled:opacity-60`}
                     >
+                        
                         {isEnrolling ? "Registering…" : "Register Now"}
                     </motion.button>
                 )}

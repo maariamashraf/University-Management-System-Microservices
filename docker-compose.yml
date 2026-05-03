@@ -301,13 +301,13 @@ services:
   frontend:
     profiles: ["full"]
     build:
-      context: ./FrontEnd
+      context: ./FrontEnd/my-app
       dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: http://localhost:8080
     container_name: frontend
     networks: [unisystem-net]
     ports:
-      - "5173:80"
+      - "5173:4173"
     depends_on:
       - api-gateway
-    environment:
-      VITE_API_BASE_URL: http://localhost:8080

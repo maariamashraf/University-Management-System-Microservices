@@ -15,7 +15,10 @@ import OAuth2Callback from "./pages/OAuth2Callback";
 import CourseDetails from "./pages/CourseDetails/CourseDetails";
 import Setting from "./pages/SettingPage/Setting";
 import AdminUserPermissionDashboard from "./features/admin/presentation/pages/AdminUserPermissionDashboard";
+import { AdminCoursesDashboard } from "./features/admin/presentation/pages/AdminCoursesDashboard";
+import AdminAuditLogDashboard from "./features/admin/presentation/pages/AdminAuditLogDashboard";
 import { Toaster } from "sonner";
+import { AdminDashboard } from "./features/admin/presentation/pages/AdminDashboard";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -68,6 +71,21 @@ const router = createBrowserRouter([
         element: <ProtectedRoute>
           <AdminUserPermissionDashboard />
           </ProtectedRoute>,
+      }
+      ,{
+        path: "admin/courses",
+        element: <ProtectedRoute><AdminCoursesDashboard /></ProtectedRoute>
+      },
+      {
+        path: "admin/audit-log",
+        element: <ProtectedRoute><AdminAuditLogDashboard /></ProtectedRoute>
+      }
+      ,{
+
+        path: "admin/dashboard",
+        element: <ProtectedRoute>
+          <AdminDashboard />
+        </ProtectedRoute>
       }
     ],
   },

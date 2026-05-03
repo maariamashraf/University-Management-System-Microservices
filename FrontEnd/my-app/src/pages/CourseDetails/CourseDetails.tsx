@@ -73,7 +73,7 @@ interface TabContentProps {
 }
 
 function TabContent({ activeTab, course, displayName, userId }: TabContentProps) {
-
+    const role = getRole();
     switch (activeTab) {
         case "overview":
             return (
@@ -81,6 +81,7 @@ function TabContent({ activeTab, course, displayName, userId }: TabContentProps)
                     course={course}
                     displayName={displayName}
                     userId={userId}
+                    canCreateAnnouncements={role === "teacher" || role === "admin"}
                 />
             );
 
