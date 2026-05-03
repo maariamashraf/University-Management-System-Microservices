@@ -1,6 +1,7 @@
 import { getToken } from "./authService";
 
-export const ApiUrl: string = "http://localhost:8080";
+export const ApiUrl: string =
+  import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080";
 export const Token: string  = "authToken";
 export const UserPermissionsStorageKey: string = "userPermissions";
 

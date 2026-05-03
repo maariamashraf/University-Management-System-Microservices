@@ -4,6 +4,8 @@ import type { AnnouncementCourseResponse } from "../../Interfaces/announcement";
 
 interface CourseAnnouncementsListProps {
     announcements: AnnouncementCourseResponse[];
+    canCreate: boolean;
+    onCreateClick: () => void;
 }
 
 function AnnouncementItem({ announcement }: { announcement: AnnouncementCourseResponse }) {
@@ -33,10 +35,21 @@ function AnnouncementItem({ announcement }: { announcement: AnnouncementCourseRe
     );
 }
 
-export default function CourseAnnouncementsList({ announcements }: CourseAnnouncementsListProps) {
+export default function CourseAnnouncementsList({ announcements, canCreate, onCreateClick }: CourseAnnouncementsListProps) {
     return (
         <div className="bg-white rounded-xl shadow-sm p-6">
-            <h3 className="text-base font-bold text-gray-800 mb-4">Announcements</h3>
+            <div className="mb-4 flex items-center justify-between gap-2">
+                <h3 className="text-base font-bold text-gray-800">Announcements</h3>
+                {canCreate ? (
+                    <button
+                        type="button"
+                        onClick={onCreateClick}
+                        className="rounded-md bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-700"
+                    >
+                        + New Announcement
+                    </button>
+                ) : null}
+            </div>
 
             {announcements.length === 0 ? (
                 <p className="text-sm text-gray-400 text-center py-6">No announcements yet.</p>
@@ -50,5 +63,6 @@ export default function CourseAnnouncementsList({ announcements }: CourseAnnounc
                 </AnimatePresence>
             )}
         </div>
+        //TODO: the announcements do not send notifications to the students or appear in their dashboard
     );
 }

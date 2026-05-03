@@ -1,4 +1,4 @@
-import { Bell, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { getToken } from "../../Services/authService";
 import { getUserDashboardData } from "../../Services/userService";

@@ -12,7 +12,6 @@ export const useEnrollCourse = () => {
                 studentId: userId,
                 courseId: courseId
             };
-                
             const response = await enrollStudentInCourse(enrolledCourseRequest);
             return response.data;
         },

@@ -23,7 +23,7 @@ export default function StatsCard({
         <div className="bg-white flex justify-between items-center px-6 rounded-xl shadow-sm h-32">
             <div className="flex flex-col items-start gap-1">
                 <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">{title}</p>
-                <p className={`text-3xl font-bold ${valueColor}`}>{value}</p>
+                <p className={`${title=="Department" ? "text-1xl" : "text-3xl"} font-bold ${valueColor}`}>{value}</p>
                 <p className="text-xs text-gray-400">{subtitle}</p>
             </div>
             <div className={`w-11 h-11 ${iconBgColor} rounded-full flex items-center justify-center`}>

@@ -1,24 +1,47 @@
-import { motion,AnimatePresence } from "framer-motion";
-import { getAnnouncementIconAndColor } from "../../utils/announcementUtils";
-import { useAnnouncementsHook } from "../../CustomeHooks/AnnounncemntHook/UseAnnouncementsHook";
+import { motion, AnimatePresence } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
 import type { AnnouncementCourseResponse } from "../../Interfaces/announcement";
 import { Bell } from "lucide-react";
+import { getUserId } from "../../Services/authService";
+import { getRole } from "../../Services/userService";
+import {
+    getAllAnnouncementsByStudentId,
+    getAllAnnouncementsByTeacherId,
+} from "../../Services/AnnouncmentService";
 
 
 export default function RecentAnnouncements() {
+    const role = getRole();
+    const userId = getUserId();
+    const { data: announcements = [] } = useQuery<AnnouncementCourseResponse[]>({
+        queryKey: ["dashboard-announcements", role, userId],
+        queryFn: async () => {
+            if (role === "teacher") {
+                return getAllAnnouncementsByTeacherId(userId);
+            }
+            return getAllAnnouncementsByStudentId(userId);
+        },
+        enabled: !!userId,
+    });
 
-const { announcements } = useAnnouncementsHook() as { announcements: AnnouncementCourseResponse[] };
+    const sortedAnnouncements = [...announcements].sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
 
-function getTimeAgo(createdAt: string) {
-    return new Date(createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-}
+    function getTimeAgo(createdAt: string) {
+        return new Date(createdAt).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+        });
+    }
 
     return (
         <div className="bg-white rounded-xl shadow-sm p-6 h-full flex flex-col">
             <h2 className="text-lg font-bold text-gray-800 mb-5">Recent Announcements</h2>
             <AnimatePresence>
             <div className="space-y-1 flex-1">
-            {announcements.slice(0, 3).map((announcement) => (
+            {sortedAnnouncements.slice(0, 3).map((announcement) => (
                 <motion.div
                     key={announcement.id}
                     initial={{ x: -60, opacity: 0 }}

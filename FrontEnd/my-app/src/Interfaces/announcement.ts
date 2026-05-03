@@ -13,6 +13,12 @@ export interface AnnouncementCourseResponse {
     courseId: number;
 }
 
+export interface AnnouncementCreateRequest {
+    title: string;
+    content: string;
+    courseId: number;
+}
+
 
 export interface AnnouncementContextType{
     announcements: AnnouncementResponse[];

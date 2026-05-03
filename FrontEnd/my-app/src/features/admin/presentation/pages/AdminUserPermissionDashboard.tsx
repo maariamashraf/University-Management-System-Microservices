@@ -18,6 +18,7 @@ function isAdmin(user: User): boolean {
 export default function AdminUserPermissionDashboard() {
     const queryClient = useQueryClient();
     const [selectedFilter, setSelectedFilter] = useState<UserTypeFilter>("all");
+    const [searchTerm, setSearchTerm] = useState("");
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [optimisticUserPermissions, setOptimisticUserPermissions] = useState<UserPermission[] | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -76,10 +77,17 @@ export default function AdminUserPermissionDashboard() {
         const nonAdminUsers = (usersQuery.data ?? []).filter(
             (user) => !isAdmin(user) && (hasRole(user, "STUDENT") || hasRole(user, "TEACHER"))
         );
-        if (selectedFilter === "students") return nonAdminUsers.filter((user) => hasRole(user, "STUDENT"));
-        if (selectedFilter === "teachers") return nonAdminUsers.filter((user) => hasRole(user, "TEACHER"));
-        return nonAdminUsers;
-    }, [selectedFilter, usersQuery.data]);
+        const roleFilteredUsers =
+            selectedFilter === "students"
+                ? nonAdminUsers.filter((user) => hasRole(user, "STUDENT"))
+                : selectedFilter === "teachers"
+                  ? nonAdminUsers.filter((user) => hasRole(user, "TEACHER"))
+                  : nonAdminUsers;
+
+        const normalizedSearch = searchTerm.trim().toLowerCase();
+        if (!normalizedSearch) return roleFilteredUsers;
+        return roleFilteredUsers.filter((user) => user.username.toLowerCase().includes(normalizedSearch));
+    }, [selectedFilter, searchTerm, usersQuery.data]);
 
     // Convert role permissions to Permission[] for the modal's display list (only role-specific ones)
     const roleDisplayPermissions = useMemo(() => {
@@ -176,7 +184,12 @@ export default function AdminUserPermissionDashboard() {
                     </p>
                 </header>
 
-                <FilterBar selectedFilter={selectedFilter} onFilterChange={setSelectedFilter} />
+                <FilterBar
+                    selectedFilter={selectedFilter}
+                    onFilterChange={setSelectedFilter}
+                    searchTerm={searchTerm}
+                    onSearchChange={setSearchTerm}
+                />
 
                 {usersQuery.isLoading ? (
                     <div className="rounded-xl border border-slate-200 bg-white p-10 text-center text-slate-500">

@@ -9,6 +9,8 @@ import {
     LogOut,
     GraduationCap,
     ShieldCheck,
+    BookAIcon,
+    BlindsIcon,
 } from "lucide-react";
 import { useAuth } from "../../ContextsProviders/AuthContext";
 import { motion } from "framer-motion";
@@ -19,15 +21,22 @@ const navItems = [
     { label: "Registration", icon: ClipboardList, to: "/dashboard/registration" },
     { label: "Grades & Transcript", icon: FileText, to: "/dashboard/grades" },
     { label: "Schedule", icon: Calendar, to: "/dashboard/schedule" },
-    { label: "Admin Users", icon: ShieldCheck, to: "/dashboard/admin/users-permissions", adminOnly: true },
     { label: "Settings", icon: Settings, to: "/dashboard/settings" },
+];
+const AdminNavItems = [
+    { label: "Dashboard", icon: LayoutDashboard, to: "/dashboard/admin/dashboard" },
+    { label: "Users", icon: ShieldCheck, to: "/dashboard/admin/users-permissions" },
+    { label: "Audit log", icon: BlindsIcon, to: "/dashboard/admin/audit-log" },
+    { label: "Courses", icon: BookAIcon, to: "/dashboard/admin/courses" },
 ];
 
 export default function AsideNav() {
     const { logout } = useAuth();
     const navigate = useNavigate();
     const role = getRole();
-    const visibleNavItems = navItems.filter((item) => !item.adminOnly || role === "admin");
+    const visibleNavItems = role === "admin" ? AdminNavItems : navItems;
+    console.log("Role is:", role);
+    console.log("Visible nav items:", visibleNavItems);
 
     const handleLogout = () => {
         logout();
@@ -58,7 +67,7 @@ export default function AsideNav() {
                     <NavLink
                     
                         to={to}
-                        end={to === "/dashboard"}
+                        end
 
                         className={({ isActive }) =>
                             `flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
