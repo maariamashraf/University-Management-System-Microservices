@@ -30,7 +30,7 @@ public class AnnouncementController {
     @TeachersOnly
     @CourseTeacherOnly(bodyParam = "request")
     @AuditLog(action = "CREATE_ANNOUNCEMENT")
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<AnnouncementResponse> createAnnouncement(@RequestBody CreateAnnouncementRequest request) {
         Announcement savedAnnouncement = createAnnouncementUseCase.create(
                 new CreateAnnouncementUseCase.CreateAnnouncementCommand(
