@@ -5,6 +5,7 @@ import com.unisystem.academic_core_service.domain.application.port.out.Enrollmen
 import com.unisystem.academic_core_service.domain.application.port.out.EventPublisherPort;
 import com.unisystem.academic_core_service.domain.events.StudentEnrollend;
 import com.unisystem.academic_core_service.domain.exceptions.AlreadyEnrolledException;
+import com.unisystem.academic_core_service.domain.exceptions.CourseNotFoundException;
 import com.unisystem.academic_core_service.domain.exceptions.InvalidEnrollmentException;
 import com.unisystem.academic_core_service.domain.model.Course;
 import com.unisystem.academic_core_service.domain.model.Enrollment;
@@ -42,7 +43,7 @@ public class EnrollStudentService  implements EnrollStudentUseCase {
     })
     public Enrollment enroll(EnrollCommand cmd) {
         Course course=courseRepositoryPort.findById(cmd.courseId())
-                .orElseThrow(()-> new RuntimeException("Course not found"));
+                .orElseThrow(()->new CourseNotFoundException(cmd.courseId()));
 
         enrollmentRepositoryPort.findByStudentIdAndCourseId(cmd.studentId(), cmd.courseId())
                 .ifPresent(e -> { throw new AlreadyEnrolledException(cmd.studentId(), cmd.courseId()); });
@@ -74,7 +75,7 @@ public class EnrollStudentService  implements EnrollStudentUseCase {
     })
     public void drop(Long studentId, Long courseId) {
         Course course=courseRepositoryPort.findById(courseId)
-                .orElseThrow(()-> new RuntimeException("Course not found"));
+                .orElseThrow(()->new CourseNotFoundException(courseId));
 
       Enrollment enrollment=  enrollmentRepositoryPort.findByStudentIdAndCourseId(studentId, courseId)
               .orElseThrow(()-> new InvalidEnrollmentException("Enrollment not found"));

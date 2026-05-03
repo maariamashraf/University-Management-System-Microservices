@@ -2,6 +2,7 @@ package com.unisystem.academic_core_service.domain.application.services;
 
 import com.unisystem.academic_core_service.domain.application.port.in.GetCoursesQuery;
 import com.unisystem.academic_core_service.domain.application.port.out.CourseRepositoryPort;
+import com.unisystem.academic_core_service.domain.exceptions.CourseNotFoundException;
 import com.unisystem.academic_core_service.domain.model.Course;
 import com.unisystem.academic_core_service.infrastructure.config.CacheConfig;
 import org.springframework.cache.annotation.Cacheable;
@@ -28,8 +29,8 @@ public class GetCoursesService implements GetCoursesQuery {
     @Cacheable(cacheNames = CacheConfig.COURSES_BY_ID_CACHE, key = "#courseId")
     public Optional<Course> findById(Long courseId) {
        Course course = courseRepository.findById(courseId)
-               .orElseThrow(() -> new RuntimeException("Course not found"));
-  
+               .orElseThrow(() -> new CourseNotFoundException(courseId));
+
        return Optional.of(course);
     }
 

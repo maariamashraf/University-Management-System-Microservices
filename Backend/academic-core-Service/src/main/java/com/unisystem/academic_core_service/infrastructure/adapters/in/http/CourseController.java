@@ -2,6 +2,7 @@ package com.unisystem.academic_core_service.infrastructure.adapters.in.http;
 
 import com.unisystem.academic_core_service.domain.application.port.in.CreateCourseUseCase;
 import com.unisystem.academic_core_service.domain.application.port.in.GetCoursesQuery;
+import com.unisystem.academic_core_service.domain.exceptions.CourseNotFoundException;
 import com.unisystem.academic_core_service.domain.model.Course;
 import com.unisystem.academic_core_service.infrastructure.aop.annotations.AuditLog;
 import com.unisystem.academic_core_service.infrastructure.aop.annotations.TeachersOnly;
@@ -30,7 +31,7 @@ public class CourseController {
     @GetMapping("/{id}")
     public ResponseEntity<Course> getCourseById(@PathVariable Long id) {
          Course course=getCoursesQuery.findById(id)
-                .orElseThrow(() -> new RuntimeException("Course not found"));
+                .orElseThrow(() -> new CourseNotFoundException(id));
         return ResponseEntity.ok(course);
     }
 

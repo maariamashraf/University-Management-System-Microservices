@@ -2,6 +2,7 @@ package com.unisystem.academic_core_service.infrastructure.adapters.in.http;
 
 import com.unisystem.academic_core_service.domain.application.port.in.EnrollStudentUseCase;
 import com.unisystem.academic_core_service.domain.application.port.out.EnrollmentRepositoryPort;
+import com.unisystem.academic_core_service.domain.exceptions.InvalidEnrollmentException;
 import com.unisystem.academic_core_service.domain.model.Enrollment;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -50,7 +51,7 @@ public class EnrollmentController {
             @PathVariable Long courseId
     ) {
         Enrollment enrollment = enrollmentRepositoryPort.findByStudentIdAndCourseId(studentId, courseId)
-                .orElseThrow(() -> new RuntimeException("Enrollment not found"));
+                .orElseThrow(() -> new InvalidEnrollmentException("Enrollment not found for student " + studentId + " in course " + courseId));
         return ResponseEntity.ok(enrollment);
     }
 
