@@ -17,8 +17,7 @@ import lombok.*;
 @AllArgsConstructor
 public class Teacher extends User {
 
-    @Column(name = "faculty")
-    private String faculty;
+
 
     @Column(name = "office_number")
     private String officeNumber;

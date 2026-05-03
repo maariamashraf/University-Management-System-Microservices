@@ -20,11 +20,10 @@ public class UpdateUserRequest {
     private String email;
 
     // Student-specific (ignored for non-students)
-    private String department;
+    private Long depId;
     private Integer yearOfStudy;
 
     // Teacher-specific (ignored for non-teachers)
-    private String faculty;
     private String officeNumber;
     private String specialization;
 }

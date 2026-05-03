@@ -14,9 +14,5 @@ import java.util.List;
 @Repository
 public interface TeacherRepository extends JpaRepository<Teacher, Long> {
 
-    List<Teacher> findByFaculty(String faculty);
-
     List<Teacher> findBySpecialization(String specialization);
-
-    List<Teacher> findByFacultyAndSpecialization(String faculty, String specialization);
 }

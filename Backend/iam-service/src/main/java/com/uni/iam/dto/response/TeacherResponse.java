@@ -24,8 +24,7 @@ public class TeacherResponse {
     private Role role;
     private LocalDateTime createdAt;
 
-    // Teacher-specific fields
-    private String faculty;
+
     private String officeNumber;
     private String specialization;
 }

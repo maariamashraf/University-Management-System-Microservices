@@ -1,13 +1,10 @@
 package com.uni.iam.service;
 
-import com.uni.iam.dto.request.CourseEnrollmentRequest;
 import com.uni.iam.dto.request.UpdateUserRequest;
-import com.uni.iam.dto.response.CourseUsersResponse;
 import com.uni.iam.dto.response.StudentResponse;
 import com.uni.iam.dto.response.TeacherResponse;
 import com.uni.iam.dto.response.UserResponse;
 import com.uni.iam.entity.*;
-import com.uni.iam.exception.AlreadyEnrolledException;
 import com.uni.iam.exception.UserNotFoundException;
 import com.uni.iam.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +29,6 @@ public class UserServiceImpl implements UserService {
     private final UserRepository             userRepository;
     private final StudentRepository          studentRepository;
     private final TeacherRepository          teacherRepository;
-    private final CourseEnrollmentRepository enrollmentRepository;
 
     // ═══════════════════════════════════════════════════════════
     // READ OPERATIONS
@@ -74,8 +70,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<StudentResponse> getStudentsByDepartment(String department) {
-        return studentRepository.findByDepartment(department)
+    public List<StudentResponse> getStudentsByDepId(Long depId) {
+        return studentRepository.findByDepId(depId)
                 .stream()
                 .map(this::toStudentResponse)
                 .toList();
@@ -99,14 +95,7 @@ public class UserServiceImpl implements UserService {
                 .toList();
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public List<TeacherResponse> getTeachersByFaculty(String faculty) {
-        return teacherRepository.findByFaculty(faculty)
-                .stream()
-                .map(this::toTeacherResponse)
-                .toList();
-    }
+
 
     // ═══════════════════════════════════════════════════════════
     // WRITE OPERATIONS
@@ -123,13 +112,12 @@ public class UserServiceImpl implements UserService {
 
         // Apply Student-specific fields
         if (user instanceof Student student) {
-            if (request.getDepartment()  != null) student.setDepartment(request.getDepartment());
+            if (request.getDepId()  != null) student.setDepId(request.getDepId());
             if (request.getYearOfStudy() != null) student.setYearOfStudy(request.getYearOfStudy());
         }
 
         // Apply Teacher-specific fields
         if (user instanceof Teacher teacher) {
-            if (request.getFaculty()       != null) teacher.setFaculty(request.getFaculty());
             if (request.getOfficeNumber()  != null) teacher.setOfficeNumber(request.getOfficeNumber());
             if (request.getSpecialization()!= null) teacher.setSpecialization(request.getSpecialization());
         }
@@ -147,59 +135,7 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(id);
     }
 
-    // ═══════════════════════════════════════════════════════════
-    // COURSE ENROLLMENT OPERATIONS
-    // ═══════════════════════════════════════════════════════════
 
-    @Override
-    @Transactional
-    public void enrollUserInCourse(CourseEnrollmentRequest request) {
-        Long userId   = request.getUserId();
-        Long courseId = request.getCourseId();
-
-        if (enrollmentRepository.existsByUserIdAndCourseId(userId, courseId)) {
-            throw new AlreadyEnrolledException(userId, courseId);
-        }
-
-        User user = findUserOrThrow(userId);
-
-        CourseEnrollment enrollment = CourseEnrollment.builder()
-                .user(user)
-                .courseId(courseId)
-                .build();
-
-        enrollmentRepository.save(enrollment);
-    }
-
-    @Override
-    @Transactional
-    public void removeUserFromCourse(Long userId, Long courseId) {
-        // Ensure user exists before attempting removal
-        findUserOrThrow(userId);
-        enrollmentRepository.deleteByUserIdAndCourseId(userId, courseId);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public CourseUsersResponse getUsersByCourse(Long courseId) {
-        List<User> users = userRepository.findAllByCourseId(courseId);
-        List<UserResponse> responses = users.stream()
-                .map(this::toUserResponse)
-                .toList();
-
-        return CourseUsersResponse.builder()
-                .courseId(courseId)
-                .users(responses)
-                .totalCount(responses.size())
-                .build();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<Long> getUserCourses(Long userId) {
-        findUserOrThrow(userId);  // validate the user exists
-        return enrollmentRepository.findCourseIdsByUserId(userId);
-    }
 
     // ═══════════════════════════════════════════════════════════
     // PRIVATE HELPERS
@@ -227,7 +163,7 @@ public class UserServiceImpl implements UserService {
                 .role(s.getRole())
                 .createdAt(s.getCreatedAt())
                 .studentNumber(s.getStudentNumber())
-                .department(s.getDepartment())
+                .depId(s.getDepId())
                 .yearOfStudy(s.getYearOfStudy())
                 .build();
     }
@@ -239,7 +175,6 @@ public class UserServiceImpl implements UserService {
                 .email(t.getEmail())
                 .role(t.getRole())
                 .createdAt(t.getCreatedAt())
-                .faculty(t.getFaculty())
                 .officeNumber(t.getOfficeNumber())
                 .specialization(t.getSpecialization())
                 .build();

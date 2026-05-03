@@ -29,11 +29,10 @@ public class RegisterRequest {
 
     // Optional extra fields — used only when role = STUDENT
     private String studentNumber;
-    private String department;
+    private Long depId;
     private Integer yearOfStudy;
 
     // Optional extra fields — used only when role = TEACHER
-    private String faculty;
     private String officeNumber;
     private String specialization;
 }

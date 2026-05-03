@@ -20,8 +20,8 @@ public class Student extends User {
     @Column(name = "student_number", unique = true)
     private String studentNumber;
 
-    @Column(name = "department")
-    private String department;
+    @Column(name = "dep_id")
+    private Long depId;
 
     @Column(name = "year_of_study")
     private Integer yearOfStudy;
