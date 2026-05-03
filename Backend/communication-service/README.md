@@ -34,60 +34,58 @@
 | **I** — Interface Segregation | Separate NotificationService and MessageService interfaces |
 | **D** — Dependency Inversion | Controllers depend on interfaces, not implementations |
 
-## Package Structure (aligned with `com.unisystem.*`)
-
-Root: **`com.unisystem.communication`**
+## Package Structure (matches project)
 
 ```
-com.unisystem.communication
-├── CommunicationServiceApplication.java
-├── controller/
+UnitSystem.demo
+├── Controllers/
 │   ├── NotificationController.java
 │   └── MessageController.java
-├── service/
-│   ├── NotificationService.java
-│   ├── MessageService.java
-│   └── impl/
-│       ├── NotificationServiceImp.java
-│       └── MessageServiceImp.java
-├── mapper/
-│   ├── NotificationMapper.java
-│   └── MessageMapper.java
-├── persistence/
-│   ├── entity/
+├── BusinessLogic/
+│   ├── InterfaceServiceLayer/
+│   │   ├── NotificationService.java    ← interface (DIP)
+│   │   └── MessageService.java         ← interface (DIP)
+│   ├── ImpServiceLayer/
+│   │   ├── NotificationServiceImp.java ← business logic + Redis cache
+│   │   └── MessageServiceImp.java      ← business logic + Redis cache
+│   └── Mappers/
+│       ├── NotificationMapper.java     ← entity ↔ DTO mapping
+│       └── MessageMapper.java          ← entity ↔ DTO mapping
+├── DataAccessLayer/
+│   ├── Entities/
 │   │   ├── Notification.java
 │   │   ├── Message.java
 │   │   ├── NotificationType.java
 │   │   ├── User.java                   ← stub (shared table)
 │   │   ├── Course.java                 ← stub (shared table)
 │   │   └── EnrolledCourse.java         ← stub (shared table)
-│   ├── repository/
+│   ├── Repositories/
 │   │   ├── NotificationRepository.java
 │   │   ├── MessageRepository.java
 │   │   ├── UserRepository.java
 │   │   └── CourseRepository.java
-│   └── dto/
-│       ├── notification/user/
+│   └── Dto/
+│       ├── Notification/User/
 │       │   ├── NotificationRequest.java
 │       │   └── NotificationResponse.java
-│       ├── notification/course/
+│       ├── Notification/Course/
 │       │   └── NotificationCourseRequest.java
-│       └── message/
+│       └── Message/
 │           ├── MessageRequest.java
 │           └── MessageResponse.java
-├── messaging/
-│   └── KafkaConsumer.java             ← listens to Kafka topics from compose/init
-├── config/
-│   ├── WebSocketConfig.java
-│   └── SwaggerConfig.java
-├── security/
-│   ├── jwt/JwtService.java
-│   ├── jwt/JwtAuthFilter.java
-│   ├── websocket/WebSocketAuthInterceptor.java
-│   └── SecurityConfig.java
-└── exception/
-    ├── ResourceNotFoundException.java
-    └── GolbalHandler.java
+├── Kafka/
+│   └── KafkaConsumer.java              ← listens to 5 topics
+├── Config/
+│   ├── WebSocketConfig/WebSocketConfig.java
+│   └── SwaggerConfig/SwaggerConfig.java
+├── Security/
+│   ├── Jwt/JwtService.java
+│   ├── Jwt/JwtAuthFilter.java
+│   ├── WebSocket/WebSocketAuthInterceptor.java
+│   └── config/SecurityConfig.java
+└── ExcHandler/
+    ├── Entites/ResourceNotFoundException.java
+    └── GolbalHandler/GolbalHandler.java
 ```
 
 ## Kafka Topics

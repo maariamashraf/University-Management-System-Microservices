@@ -6,9 +6,6 @@ import com.unisystem.academic_core_service.domain.application.port.out.EventPubl
 import com.unisystem.academic_core_service.domain.events.CourseCreatedEvent;
 import com.unisystem.academic_core_service.domain.exceptions.DuplicateCourseException;
 import com.unisystem.academic_core_service.domain.model.Course;
-import com.unisystem.academic_core_service.infrastructure.config.CacheConfig;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Caching;
 
 import java.time.LocalDate;
 
@@ -23,15 +20,7 @@ public class CreateCourseService implements CreateCourseUseCase {
     }
 
     @Override
-    @Caching(evict = {
-            @CacheEvict(cacheNames = CacheConfig.COURSES_ALL_CACHE, allEntries = true),
-            @CacheEvict(cacheNames = CacheConfig.COURSES_BY_ID_CACHE, allEntries = true),
-            @CacheEvict(cacheNames = CacheConfig.COURSES_BY_TEACHER_NAME_CACHE, allEntries = true),
-            @CacheEvict(cacheNames = CacheConfig.COURSES_BY_TEACHER_ID_CACHE, allEntries = true),
-            @CacheEvict(cacheNames = CacheConfig.COURSES_BY_NAME_CACHE, allEntries = true),
-            @CacheEvict(cacheNames = CacheConfig.COURSES_BY_DEPARTMENT_CACHE, allEntries = true),
-            @CacheEvict(cacheNames = CacheConfig.COURSES_POPULAR_CACHE, allEntries = true)
-    })
+
     public Course create(CreateCourseCommand cmd) {
         Boolean exists = courseRepository.existsByCourseCode(cmd.courseCode());
         if (exists) {

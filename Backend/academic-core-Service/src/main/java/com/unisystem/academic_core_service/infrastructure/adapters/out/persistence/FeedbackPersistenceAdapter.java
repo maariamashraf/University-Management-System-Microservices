@@ -1,11 +1,15 @@
 package com.unisystem.academic_core_service.infrastructure.adapters.out.persistence;
 
+import com.unisystem.academic_core_service.domain.application.port.out.FeedbackRepsitoryPort;
+import com.unisystem.academic_core_service.domain.model.Feedback;
 import com.unisystem.academic_core_service.infrastructure.adapters.out.persistence.entity.FeedbackEntity;
 import com.unisystem.academic_core_service.infrastructure.adapters.out.persistence.mapper.FeedbackPersistenceMapper;
 import com.unisystem.academic_core_service.infrastructure.adapters.out.persistence.repository.FeedbackJpaRepository;
-import com.unisystem.academic_core_service.domain.application.port.out.FeedbackRepsitoryPort;
-import com.unisystem.academic_core_service.domain.model.Feedback;
+import com.unisystem.academic_core_service.infrastructure.config.CacheConfig;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -19,27 +23,37 @@ public class FeedbackPersistenceAdapter implements FeedbackRepsitoryPort {
     private final FeedbackPersistenceMapper feedbackPersistenceMapper;
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(cacheNames = CacheConfig.FEEDBACK_BY_COURSE_CACHE, allEntries = true),
+            @CacheEvict(cacheNames = CacheConfig.FEEDBACK_BY_USER_CACHE, allEntries = true),
+            @CacheEvict(cacheNames = CacheConfig.FEEDBACK_BY_ID_CACHE, allEntries = true),
+            @CacheEvict(cacheNames = CacheConfig.FEEDBACK_ALL_CACHE, allEntries = true)
+    })
     public Feedback save(Feedback feedback) {
         FeedbackEntity saved = feedbackJpaRepository.save(feedbackPersistenceMapper.toEntity(feedback));
         return feedbackPersistenceMapper.toDomain(saved);
     }
 
     @Override
+    @Cacheable(cacheNames = CacheConfig.FEEDBACK_ALL_CACHE)
     public List<Feedback> findAll() {
         return feedbackJpaRepository.findAll().stream().map(feedbackPersistenceMapper::toDomain).toList();
     }
 
     @Override
+    @Cacheable(cacheNames = CacheConfig.FEEDBACK_BY_ID_CACHE, key = "#id")
     public Optional<Feedback> findById(Long id) {
         return feedbackJpaRepository.findById(id).map(feedbackPersistenceMapper::toDomain);
     }
 
     @Override
+    @Cacheable(cacheNames = CacheConfig.FEEDBACK_BY_COURSE_CACHE, key = "#courseId")
     public List<Feedback> findByCourseId(Long courseId) {
         return feedbackJpaRepository.findByCourseId(courseId).stream().map(feedbackPersistenceMapper::toDomain).toList();
     }
 
     @Override
+    @Cacheable(cacheNames = CacheConfig.FEEDBACK_BY_USER_CACHE, key = "#userId")
     public List<Feedback> findByUserId(Long userId) {
         return feedbackJpaRepository.findByUserId(userId).stream().map(feedbackPersistenceMapper::toDomain).toList();
     }

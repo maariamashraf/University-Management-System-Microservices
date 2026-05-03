@@ -8,24 +8,36 @@ import org.springframework.kafka.config.TopicBuilder;
 @Configuration
 public class KafkaConfig {
 
-
-   @Bean
-  public NewTopic studentEnrolledTopic() {
-      return TopicBuilder.name(KafkaTopics.STUDENT_ENROLLED)
-              .build();
-  }
-
+    @Bean
+    public NewTopic studentEnrolledTopic() {
+        return TopicBuilder.name(KafkaTopics.STUDENT_ENROLLED)
+                .partitions(1)
+                .replicas(1)
+                .build();
+    }
 
     @Bean
     public NewTopic courseCreatedTopic() {
         return TopicBuilder.name(KafkaTopics.COURSE_CREATED)
+                .partitions(1)
+                .replicas(1)
                 .build();
     }
 
     @Bean
     public NewTopic announcementCreatedTopic() {
         return TopicBuilder.name(KafkaTopics.ANNOUNCEMENT_CREATED)
+                .partitions(1)
+                .replicas(1)
                 .build();
     }
 
+    @Bean
+    public NewTopic notificationPushTopic() {
+        return TopicBuilder.name(KafkaTopics.NOTIFICATION_PUSH)
+                .partitions(1)
+                .replicas(1)
+                .build();
+    }
 }
+
