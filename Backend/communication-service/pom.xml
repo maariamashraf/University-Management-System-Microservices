@@ -8,7 +8,7 @@
 		<version>3.4.2</version>
 		<relativePath/>
 	</parent>
-	<groupId>UnitSystem</groupId>
+	<groupId>com.unisystem</groupId>
 	<artifactId>communication-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>communication-service</name>
