@@ -45,7 +45,7 @@ The `docker-compose.yml` file provides orchestration for the following:
 | Issue | Problem | Fix |
 |--------|---------|-----|
 | **API Gateway routing gaps / path mismatch** | Gateway routes **academic-core** to `/api/courses/**`, `/api/departments/**`, `/api/enrolled-courses/**`. Academic exposes **`/api/enrollments`**, **`/api/announcements`**, **`/api/feedbacks`**, etc. Gateway routes **`/api/students/**`** and **`/api/teachers/**`** to IAM, but IAM uses **`/api/users/...`** (e.g. `/api/users/students`). Many requests **404** or hit the wrong service. | Publish a single path contract (OpenAPI or table). Update gateway **predicates** (and rewrites if needed). Align **frontend** URLs with real controllers. |
-| **Kafka topic names: producers vs consumers** | Academic publishes to **`student.enrolled`**, **`course.created`**, **`announcement.created`**. Communication consumer listens to **`student-enrolled`**, **`course-created`**, **`announcement-created`**. Compose **kafka-init** creates hyphen names; academic **NewTopic** beans create dot names. Events **do not flow** reliably between services. | Standardize **one naming scheme** everywhere (producers, consumers, `kafka-init`, remove duplicate creation if one source is canonical). |
+| **Kafka topic names: producers vs consumers--DONE✅** | Academic publishes to **`student.enrolled`**, **`course.created`**, **`announcement.created`**. Communication consumer listens to **`student-enrolled`**, **`course-created`**, **`announcement-created`**. Compose **kafka-init** creates hyphen names; academic **NewTopic** beans create dot names. Events **do not flow** reliably between services. | Standardize **one naming scheme** everywhere (producers, consumers, `kafka-init`, remove duplicate creation if one source is canonical). |
 
 #### High
 
@@ -65,7 +65,7 @@ The `docker-compose.yml` file provides orchestration for the following:
 
 | Issue | Problem | Fix |
 |--------|---------|-----|
-| **Naming typos** | e.g. `StudentEnrollend`, `kafkaConifg`. | Rename with care if topics/events are public. |
+| **Naming typos--DONE✅** | e.g. `StudentEnrollend`, `kafkaConifg`. | Rename with care if topics/events are public. |
 
 ---
 
@@ -73,7 +73,7 @@ The `docker-compose.yml` file provides orchestration for the following:
 
 #### Critical
 
-- Same as **Kafka topic inconsistency** (section 1).
+- Same as **Kafka topic inconsistency--DONE✅** (section 1).
 
 #### High
 
@@ -205,7 +205,7 @@ Useful skeleton: **Gateway + JWT filter**, **Eureka**, **Redis cache**, **Kafka 
 ### Prioritized action plan
 
 1. **Unify HTTP contracts** — Gateway predicates, controllers, frontend (especially enrollments vs enrolled-courses, users vs students/teachers).
-2. **Fix Kafka** — One topic naming convention; align **kafka-init**, `NewTopic`, producers, consumers; fix **payload shapes**.
+2. **Fix Kafka** — ✅One topic naming convention; ❌align **kafka-init**, `NewTopic`, producers, consumers; ❌fix **payload shapes**.
 3. **Harden services** — JWT (or equivalent) beyond gateway for every internet-facing hop; eliminate **permitAll** in integrated profiles.
 4. **Clarify data ownership** — Shared DB documented or split; consistent Flyway/DDL strategy.
 5. **Errors & audits** ✅ — Global exception handler added to academic-core; real audit persistence/API still pending if admin features require it.

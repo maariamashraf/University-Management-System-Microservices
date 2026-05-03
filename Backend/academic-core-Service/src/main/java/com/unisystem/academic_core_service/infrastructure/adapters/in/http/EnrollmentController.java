@@ -11,14 +11,14 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/enrollments")
+@RequestMapping("/api/enrolled-courses")
 @RequiredArgsConstructor
 public class EnrollmentController {
 
     private final EnrollStudentUseCase enrollStudentUseCase;
     private final EnrollmentRepositoryPort enrollmentRepositoryPort;
 
-    @PostMapping("/enroll")
+    @PostMapping
     public ResponseEntity<Enrollment> enroll(@RequestBody EnrollRequest request) {
         Enrollment enrollment = enrollStudentUseCase.enroll(
                 new EnrollStudentUseCase.EnrollCommand(request.studentId(), request.courseId())
