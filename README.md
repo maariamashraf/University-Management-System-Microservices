@@ -116,7 +116,7 @@ The `docker-compose.yml` file provides orchestration for the following:
 
 | Issue | Problem | Fix |
 |--------|---------|-----|
-| **Redis cache TTL-only** | ~10-minute TTL → **stale reads** after writes. | **`@CacheEvict`** / targeted invalidation on mutations. |
+| **Redis cache TTL-only** ✅ | ~~TTL-only → stale reads after writes.~~ **Resolved**: `@CacheEvict` / `@Caching` added to all mutating operations in academic-core (`CreateCourseService`, `EnrollStudentService`, `CreateAnnouncementService`, `SubmitFeedbackService`). | — |
 | **Unstructured Kafka publish logging** | `System.out` in adapters. | **SLF4J + MDC** (structured logs). |
 
 #### Low
@@ -155,7 +155,7 @@ The `docker-compose.yml` file provides orchestration for the following:
 
 | Issue | Problem | Fix |
 |--------|---------|-----|
-| **No global `@ControllerAdvice` in academic-core** | Raw **`RuntimeException`** paths → inconsistent **500** responses. | Unified error model (e.g. problem+json); map domain errors to **4xx**. |
+| **No global `@ControllerAdvice` in academic-core** ✅ | ~~Raw `RuntimeException` paths → inconsistent 500 responses.~~ **Resolved**: `GlobalExceptionHandler` (`@RestControllerAdvice`) added. Domain exceptions (`CourseNotFoundException`, `AlreadyEnrolledException`, `DuplicateCourseException`, `InvalidEnrollmentException`) map to `404`, `409`, `400` respectively. Fallback handler returns `500`. | — |
 | **Audit annotation vs persistence** | AOP logs to logs; **`audit_logs` table exists** but admin UI may expect **`/api/audit-logs`** without a matching backend. | Persist audits + expose read API **or** remove misleading UI/feature name. |
 
 #### Medium
@@ -208,5 +208,5 @@ Useful skeleton: **Gateway + JWT filter**, **Eureka**, **Redis cache**, **Kafka 
 2. **Fix Kafka** — One topic naming convention; align **kafka-init**, `NewTopic`, producers, consumers; fix **payload shapes**.
 3. **Harden services** — JWT (or equivalent) beyond gateway for every internet-facing hop; eliminate **permitAll** in integrated profiles.
 4. **Clarify data ownership** — Shared DB documented or split; consistent Flyway/DDL strategy.
-5. **Errors & audits** — Global handlers; real audit persistence/API if admin features require it.
+5. **Errors & audits** ✅ — Global exception handler added to academic-core; real audit persistence/API still pending if admin features require it.
 6. **Tests** — Integration + contract tests around gateway and messaging.
