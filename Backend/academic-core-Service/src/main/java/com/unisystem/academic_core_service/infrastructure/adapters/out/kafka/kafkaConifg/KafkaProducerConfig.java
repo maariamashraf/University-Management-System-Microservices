@@ -1,5 +1,5 @@
 package com.unisystem.academic_core_service.infrastructure.adapters.out.kafka.kafkaConifg;
-import com.fasterxml.jackson.databind.JsonSerializer;
+import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
