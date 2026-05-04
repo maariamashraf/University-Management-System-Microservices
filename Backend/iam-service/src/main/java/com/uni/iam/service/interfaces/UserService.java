@@ -1,8 +1,6 @@
-package com.uni.iam.service;
+package com.uni.iam.service.interfaces;
 
 import com.uni.iam.dto.request.UpdateUserRequest;
-import com.uni.iam.dto.response.StudentResponse;
-import com.uni.iam.dto.response.TeacherResponse;
 import com.uni.iam.dto.response.UserResponse;
 import com.uni.iam.entity.Role;
 
@@ -15,7 +13,6 @@ import java.util.List;
  *
  * Covered operations:
  *   - Get user(s) by ID, role, course
- *   - List all students / teachers
  *   - Update and delete users
  */
 public interface UserService {
@@ -33,20 +30,6 @@ public interface UserService {
 
     /** Fetch all users with a specific role. */
     List<UserResponse> getUsersByRole(Role role);
-
-    /** Fetch all students with full student-specific fields. */
-    List<StudentResponse> getAllStudents();
-
-    /** Fetch students filtered by department ID. */
-    List<StudentResponse> getStudentsByDepId(Long depId);
-
-    /** Fetch students filtered by year of study. */
-    List<StudentResponse> getStudentsByYear(Integer year);
-
-    /** Fetch all teachers with full teacher-specific fields. */
-    List<TeacherResponse> getAllTeachers();
-
-
 
     // ── Write operations ─────────────────────────────────────────────────────
 

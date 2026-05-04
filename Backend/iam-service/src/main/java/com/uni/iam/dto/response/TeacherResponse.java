@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -24,7 +25,6 @@ public class TeacherResponse {
     private Role role;
     private LocalDateTime createdAt;
 
-
-    private String officeNumber;
-    private String specialization;
+    private String officeLocation;
+    private BigDecimal salary;
 }

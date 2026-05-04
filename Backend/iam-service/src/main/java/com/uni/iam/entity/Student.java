@@ -2,6 +2,10 @@ package com.uni.iam.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
 
 /**
  * ENTITY LAYER
@@ -10,19 +14,21 @@ import lombok.*;
  */
 @Entity
 @Table(name = "students")
-@DiscriminatorValue("STUDENT")
+@PrimaryKeyJoinColumn(name = "id", referencedColumnName = "id")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@SuperBuilder
+@ToString(callSuper = true)
 public class Student extends User {
 
-    @Column(name = "student_number", unique = true)
-    private String studentNumber;
+    @Column(name = "gpa", precision = 3, scale = 2)
+    private BigDecimal gpa;
 
-    @Column(name = "dep_id")
-    private Long depId;
+    @Column(name = "enrollment_date")
+    private LocalDate enrollmentDate;
 
-    @Column(name = "year_of_study")
-    private Integer yearOfStudy;
+    @Column(name = "total_credits")
+    private Integer totalCredits;
 }

@@ -3,7 +3,7 @@ package com.uni.iam.controller;
 import com.uni.iam.dto.request.LoginRequest;
 import com.uni.iam.dto.request.RegisterRequest;
 import com.uni.iam.dto.response.AuthResponse;
-import com.uni.iam.service.AuthService;
+import com.uni.iam.service.interfaces.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -43,15 +43,8 @@ public class AuthController {
             @Valid @RequestBody RegisterRequest request,
             Authentication authentication
     ) {
-        String currentRole = null;
-        if (authentication != null && authentication.getAuthorities() != null) {
-            currentRole = authentication.getAuthorities().stream()
-                    .map(a -> a.getAuthority())
-                    .findFirst()
-                    .orElse(null);
-        }
-        
-        AuthResponse response = authService.register(request, currentRole);
+
+        AuthResponse response = authService.register(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

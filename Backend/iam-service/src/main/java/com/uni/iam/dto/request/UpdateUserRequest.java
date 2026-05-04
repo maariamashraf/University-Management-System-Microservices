@@ -18,12 +18,4 @@ public class UpdateUserRequest {
 
     @Email(message = "Invalid email format")
     private String email;
-
-    // Student-specific (ignored for non-students)
-    private Long depId;
-    private Integer yearOfStudy;
-
-    // Teacher-specific (ignored for non-teachers)
-    private String officeNumber;
-    private String specialization;
 }

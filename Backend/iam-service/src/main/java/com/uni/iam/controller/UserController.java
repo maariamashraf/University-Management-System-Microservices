@@ -1,14 +1,11 @@
 package com.uni.iam.controller;
 
 import com.uni.iam.dto.request.UpdateUserRequest;
-import com.uni.iam.dto.response.StudentResponse;
-import com.uni.iam.dto.response.TeacherResponse;
 import com.uni.iam.dto.response.UserResponse;
 import com.uni.iam.entity.Role;
-import com.uni.iam.service.UserService;
+import com.uni.iam.service.interfaces.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -78,55 +75,12 @@ public class UserController {
     }
 
     // ════════════════════════════════════════════════════════════
-    // GET  /api/users/students
-    // All students with student-specific fields.
-    // ════════════════════════════════════════════════════════════
-    @GetMapping("/students")
-    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
-    public ResponseEntity<List<StudentResponse>> getAllStudents() {
-        return ResponseEntity.ok(userService.getAllStudents());
-    }
-
-    // ════════════════════════════════════════════════════════════
-    // GET  /api/users/students/department/{depId}
-    // Filter students by department ID.
-    // ════════════════════════════════════════════════════════════
-    @GetMapping("/students/department/{depId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
-    public ResponseEntity<List<StudentResponse>> getStudentsByDepId(
-            @PathVariable Long depId) {
-        return ResponseEntity.ok(userService.getStudentsByDepId(depId));
-    }
-
-    // ════════════════════════════════════════════════════════════
-    // GET  /api/users/students/year/{year}
-    // Filter students by year of study.
-    // ════════════════════════════════════════════════════════════
-    @GetMapping("/students/year/{year}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
-    public ResponseEntity<List<StudentResponse>> getStudentsByYear(@PathVariable Integer year) {
-        return ResponseEntity.ok(userService.getStudentsByYear(year));
-    }
-
-    // ════════════════════════════════════════════════════════════
-    // GET  /api/users/teachers
-    // All teachers with teacher-specific fields. Admin-only.
-    // ════════════════════════════════════════════════════════════
-    @GetMapping("/teachers")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<TeacherResponse>> getAllTeachers() {
-        return ResponseEntity.ok(userService.getAllTeachers());
-    }
-
-
-
-    // ════════════════════════════════════════════════════════════
     // PUT  /api/users/{id}
     // Partial update — only non-null fields are changed.
     // ADMIN can update anyone; users can update themselves.
     // ════════════════════════════════════════════════════════════
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.username")
+    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
     public ResponseEntity<UserResponse> updateUser(
             @PathVariable Long id,
             @Valid @RequestBody UpdateUserRequest request) {

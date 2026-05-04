@@ -2,6 +2,9 @@ package com.uni.iam.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
+
+import java.math.BigDecimal;
 
 /**
  * ENTITY LAYER
@@ -10,18 +13,18 @@ import lombok.*;
  */
 @Entity
 @Table(name = "teachers")
-@DiscriminatorValue("TEACHER")
+@PrimaryKeyJoinColumn(name = "id", referencedColumnName = "id")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@SuperBuilder
+@ToString(callSuper = true)
 public class Teacher extends User {
 
+    @Column(name = "office_location")
+    private String officeLocation;
 
-
-    @Column(name = "office_number")
-    private String officeNumber;
-
-    @Column(name = "specialization")
-    private String specialization;
+    @Column(name = "salary", precision = 10, scale = 2)
+    private BigDecimal salary;
 }

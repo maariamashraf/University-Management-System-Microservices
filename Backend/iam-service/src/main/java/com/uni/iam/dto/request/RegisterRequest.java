@@ -1,6 +1,5 @@
 package com.uni.iam.dto.request;
 
-import com.uni.iam.entity.Role;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
@@ -24,15 +23,5 @@ public class RegisterRequest {
     @Size(min = 6, message = "Password must be at least 6 characters")
     private String password;
 
-    @NotNull(message = "Role is required")
-    private Role role;   // STUDENT | TEACHER | ADMIN
-
-    // Optional extra fields — used only when role = STUDENT
-    private String studentNumber;
-    private Long depId;
-    private Integer yearOfStudy;
-
-    // Optional extra fields — used only when role = TEACHER
-    private String officeNumber;
-    private String specialization;
+    private String teacherCode;
 }

@@ -21,6 +21,16 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final UserRepository userRepository;
 
+    /**
+     * Holds current authenticated user id per request thread.
+     */
+    private static final ThreadLocal<Long> currentUserId = new ThreadLocal<>();
+    public Long getCurrentUserId() {
+        return currentUserId.get();
+    }
+    public void clearCurrentUserId() {
+        currentUserId.remove();
+    }
     @Override
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -28,10 +38,15 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException(
                         "User not found with username: " + username));
 
+        currentUserId.set(user.getId());
+
         return new org.springframework.security.core.userdetails.User(
                 user.getUsername(),
                 user.getPassword(),
                 List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()))
         );
     }
+
+
+
 }
