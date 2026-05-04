@@ -30,12 +30,13 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
     // Only truly public endpoints — access control for other routes
     // belongs to downstream services, not the gateway
     private static final List<String> PUBLIC = List.of(
-        "/api/auth/login",
-        "/api/auth/register",
-        "/api/courses/popular",
-        "/api/departments/all",
-        "/api/feedbacks/recent"
-    );
+    "/api/auth/login",
+    "/api/auth/register",
+    "/api/courses/popular",
+    "/api/departments/all",
+    "/api/feedbacks/recent",
+    "/ws"   // WebSocket handshake — auth handled by WebSocketAuthInterceptor inside communication-service
+);
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -43,9 +44,17 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
         String path = exchange.getRequest().getURI().getPath();
 
         // Allow public endpoints to pass through without a token
-        if (PUBLIC.stream().anyMatch(path::startsWith)) {
-            return chain.filter(exchange);
-        }
+        if if (PUBLIC.stream().anyMatch(path::startsWith)) {
+    // Strip identity headers even on public routes to prevent client spoofing
+    ServerHttpRequest stripped = exchange.getRequest().mutate()
+            .headers(h -> {
+                h.remove("X-User-Id");
+                h.remove("X-Username");
+                h.remove("X-Roles");
+            })
+            .build();
+    return chain.filter(exchange.mutate().request(stripped).build());
+}
 
         String auth = exchange.getRequest().getHeaders().getFirst("Authorization");
 
@@ -72,11 +81,17 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
             Object roles  = claims.get("roles");
 
             // Inject validated claims as headers for downstream services
-            ServerHttpRequest mutated = exchange.getRequest().mutate()
-                    .header("X-User-Id",  userId != null ? userId.toString() : "")
-                    .header("X-Username", claims.getSubject())
-                    .header("X-Roles",    roles  != null ? roles.toString()  : "")
-                    .build();
+            // Strip client-supplied identity headers first, then inject validated ones
+ServerHttpRequest mutated = exchange.getRequest().mutate()
+        .headers(h -> {
+            h.remove("X-User-Id");
+            h.remove("X-Username");
+            h.remove("X-Roles");
+        })
+        .header("X-User-Id",  userId != null ? userId.toString() : "")
+        .header("X-Username", claims.getSubject())
+        .header("X-Roles",    roles  != null ? roles.toString()  : "")
+        .build();
 
             return chain.filter(exchange.mutate().request(mutated).build());
 
