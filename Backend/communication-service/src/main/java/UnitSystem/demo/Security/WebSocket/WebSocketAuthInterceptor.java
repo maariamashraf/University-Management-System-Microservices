@@ -1,6 +1,8 @@
 package UnitSystem.demo.Security.WebSocket;
 
-import UnitSystem.demo.Security.Jwt.JwtService;
+import UnitSystem.demo.Security.jwt.JwtService;  // ← add this
+
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
