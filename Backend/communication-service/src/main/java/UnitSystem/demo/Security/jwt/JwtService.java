@@ -1,5 +1,4 @@
 package UnitSystem.demo.Security.jwt;
-
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -10,11 +9,7 @@ import org.springframework.stereotype.Service;
 import java.security.Key;
 import java.util.Date;
 
-/**
- * SOLID — Single Responsibility: only handles JWT parsing and validation.
- * Uses the same secret as the IAM service so tokens issued there
- * are valid here too.
- */
+
 @Service
 @Slf4j
 public class JwtService {

@@ -19,7 +19,7 @@ import java.util.Map;
  *
  * Handled exceptions:
  *   UserAlreadyExistsException  → 409 Conflict
- *   UserNotFoundException        → 404 Not Found
+ *   UserNotFoundException / UserNotFoundByUsernameException → 404 Not Found
  *   BadCredentialsException      → 401 Unauthorized
  *   MethodArgumentNotValidException → 400 Bad Request
  *   Exception (fallback)         → 500 Internal Server Error

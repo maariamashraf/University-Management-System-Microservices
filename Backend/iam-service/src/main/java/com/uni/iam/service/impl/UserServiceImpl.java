@@ -4,6 +4,7 @@ import com.uni.iam.dto.request.UpdateUserRequest;
 import com.uni.iam.dto.response.UserResponse;
 import com.uni.iam.entity.Role;
 import com.uni.iam.entity.User;
+import com.uni.iam.exception.UserNotFoundByUsernameException;
 import com.uni.iam.exception.UserNotFoundException;
 import com.uni.iam.repository.UserRepository;
 import com.uni.iam.service.interfaces.UserService;
@@ -29,7 +30,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public UserResponse getUserByUsername(String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found: " + username));
+                .orElseThrow(() -> new UserNotFoundByUsernameException(username));
         return toUserResponse(user);
     }
 

@@ -1,6 +1,5 @@
 package com.uni.iam.config;
 
-import com.uni.iam.security.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,7 +31,6 @@ import org.springframework.security.web.SecurityFilterChain;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final UserDetailsServiceImpl userDetailsService;
     private final com.uni.iam.security.JwtAuthFilter jwtAuthFilter;
 
     @Bean

@@ -78,35 +78,6 @@ public class AuthServiceImpl implements AuthService {
                 .build();
     }
 
-    @Override
-    public AuthResponse refresh(String token) {
-        if (!jwtUtils.validateToken(token)) {
-            throw new RuntimeException("Invalid or expired token");
-        }
-
-        String username = jwtUtils.getUsernameFromToken(token);
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        org.springframework.security.core.userdetails.UserDetails userDetails =
-                org.springframework.security.core.userdetails.User.builder()
-                        .username(user.getUsername())
-                        .password(user.getPassword() != null ? user.getPassword() : "")
-                        .roles(user.getRole().name())
-                        .build();
-
-        Authentication auth = new UsernamePasswordAuthenticationToken(
-                userDetails, null, userDetails.getAuthorities()
-        );
-        String newToken = jwtUtils.generateToken(auth);
-
-        return AuthResponse.builder()
-                .token(newToken)
-                .userId(user.getId())
-                .username(user.getUsername())
-                .build();
-    }
-
     private User buildUser(RegisterRequest req) {
         String hashed = passwordEncoder.encode(req.getPassword());
         String teacherCode = req.getTeacherCode() == null ? null : req.getTeacherCode().trim();
