@@ -24,14 +24,9 @@ public class SecurityConfig {
             .sessionManagement(session ->
                     session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                    // REST API — open for all
                     .requestMatchers("/api/**").permitAll()
-                    // Swagger — open
                     .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/api-docs/**").permitAll()
-                    // Actuator — open
                     .requestMatchers("/actuator/**").permitAll()
-                    // WebSocket endpoint — open at HTTP level
-                    // (actual auth is handled by WebSocketAuthInterceptor)
                     .requestMatchers("/ws/**").permitAll()
                     .anyRequest().permitAll()
             );
