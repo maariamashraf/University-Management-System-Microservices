@@ -14,7 +14,7 @@ import java.time.LocalDate;
  */
 @Entity
 @Table(name = "students")
-@PrimaryKeyJoinColumn(name = "id", referencedColumnName = "id")
+@PrimaryKeyJoinColumn(name = "user_id", referencedColumnName = "id")
 @Getter
 @Setter
 @NoArgsConstructor

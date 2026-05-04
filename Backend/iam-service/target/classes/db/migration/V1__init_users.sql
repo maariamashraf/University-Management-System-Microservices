@@ -28,6 +28,11 @@ CREATE TABLE IF NOT EXISTS teachers (
     salary          DECIMAL(10, 2),
     FOREIGN KEY (id) REFERENCES users(id) ON DELETE CASCADE
 );
+CREATE TABLE IF NOT EXISTS admins (
+                                      user_id BIGINT PRIMARY KEY,
+
+                                      CONSTRAINT fk_admin_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
 
 -- Indexes for common lookups
 CREATE INDEX idx_users_role      ON users(role);

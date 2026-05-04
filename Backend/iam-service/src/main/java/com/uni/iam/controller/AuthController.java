@@ -35,7 +35,7 @@ public class AuthController {
     private final AuthService authService;
 
     /**
-     * Register a new user (Student, Teacher, or Admin).
+     * Register a new user (Student, Teacher)
      * Returns 201 Created + JWT on success.
      */
     @PostMapping("/register")
@@ -46,7 +46,7 @@ public class AuthController {
         AuthResponse response = authService.register(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
-    
+
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         AuthResponse response = authService.login(request);
