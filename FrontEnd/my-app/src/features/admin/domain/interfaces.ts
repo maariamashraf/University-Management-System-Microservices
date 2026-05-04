@@ -17,7 +17,7 @@ export interface User {
     username: string;
     email: string;
     active: boolean;
-    roles: Role[];
+    role: string;
     /** Rows from `user_permissions` when returned from GET /api/users (optional on older payloads). */
     userPermissions?: UserPermission[];
 }

@@ -19,7 +19,6 @@ export interface Teacher {
     email: string;
     salary: number;
     department: string;
-    roles: string[];
     courses: TeacherCourse[];
     announcements: AnnouncementResponse[];
     upcomingEvents: UpcomingEventResponse[];

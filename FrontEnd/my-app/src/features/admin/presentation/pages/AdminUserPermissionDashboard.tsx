@@ -7,12 +7,12 @@ import type { User, UserPermission, UserPermissionRequest, UserTypeFilter } from
 import { userService } from "../../infrastructure/services/UserService";
 import { permissionService } from "../../infrastructure/services/PermissionService";
 import { getRole } from "../../../../Services/userService";
-function hasRole(user: User, targetRole: "STUDENT" | "TEACHER"): boolean {
-    return user.roles.some((role) => role.name.toUpperCase().includes(targetRole));
+function normalizeRole(role: string): string {
+    return role.replace(/^ROLE_/, "").toLowerCase();
 }
 
 function isAdmin(user: User): boolean {
-    return user.roles.some((role) => role.name.toUpperCase().includes("ADMIN"));
+    return normalizeRole(user.role) === "admin";
 }
 
 export default function AdminUserPermissionDashboard() {
@@ -36,7 +36,11 @@ export default function AdminUserPermissionDashboard() {
 
     // Determine selected user's role to pick the right permissions endpoint
     const selectedUserRole = selectedUser
-        ? hasRole(selectedUser, "STUDENT") ? "student" : hasRole(selectedUser, "TEACHER") ? "teacher" : null
+        ? normalizeRole(selectedUser.role) === "student"
+            ? "student"
+            : normalizeRole(selectedUser.role) === "teacher"
+                ? "teacher"
+                : null
         : null;
 
     // Fetch only the permissions that belong to the selected user's role
@@ -75,13 +79,13 @@ export default function AdminUserPermissionDashboard() {
     const filteredUsers = useMemo(() => {
         // Exclude any user who has an Admin role, even if they also have Student/Teacher
         const nonAdminUsers = (usersQuery.data ?? []).filter(
-            (user) => !isAdmin(user) && (hasRole(user, "STUDENT") || hasRole(user, "TEACHER"))
+            (user) => !isAdmin(user) && (normalizeRole(user.role) === "student" || normalizeRole(user.role) === "teacher")
         );
         const roleFilteredUsers =
             selectedFilter === "students"
-                ? nonAdminUsers.filter((user) => hasRole(user, "STUDENT"))
+                ? nonAdminUsers.filter((user) => normalizeRole(user.role) === "student")
                 : selectedFilter === "teachers"
-                  ? nonAdminUsers.filter((user) => hasRole(user, "TEACHER"))
+                  ? nonAdminUsers.filter((user) => normalizeRole(user.role) === "teacher")
                   : nonAdminUsers;
 
         const normalizedSearch = searchTerm.trim().toLowerCase();

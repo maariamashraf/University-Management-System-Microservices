@@ -1,9 +1,10 @@
 import axios from "axios";
 import { ApiUrl, getAuthHeaders } from "./config";
+import type { Student } from "../Interfaces/student";
 
-export async function getStudentInfo(id: number) {
+export async function getStudentInfo(_id: number): Promise<Student> {
     try {
-        const response = await axios.get(`${ApiUrl}/api/students/details/${id}`, {
+        const response = await axios.get<Student>(`${ApiUrl}/api/students/details/${_id}`, {
             headers: getAuthHeaders(),
         });
         return response.data;

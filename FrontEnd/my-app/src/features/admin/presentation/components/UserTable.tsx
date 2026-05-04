@@ -10,8 +10,10 @@ interface UserTableProps {
     onSelectUser: (user: User) => void;
 }
 function toDisplayRoleName(name: string): string {
-    if (name.toUpperCase().includes("STUDENT")) return "Student";
-    if (name.toUpperCase().includes("TEACHER")) return "Teacher";
+    const normalized = name.replace(/^ROLE_/, "").toLowerCase();
+    if (normalized === "student") return "Student";
+    if (normalized === "teacher") return "Teacher";
+    if (normalized === "admin") return "Admin";
     return name;
 }
 export default function UserTable({ users, onSelectUser }: UserTableProps) {
@@ -75,8 +77,8 @@ export default function UserTable({ users, onSelectUser }: UserTableProps) {
                         <tr key={user.id} className="hover:bg-slate-50">
                             <td className="px-4 py-3 text-sm font-medium text-slate-800">{user.username}</td>
                             <td className="px-4 py-3 text-sm text-slate-600">{user.email}</td>
-                            <td className={`px-4 py-3 text-sm font-medium ${user.roles.some((role) => toDisplayRoleName(role.name) === 'Student') ? "text-gray-500" : "text-green-500"}`} >
-                                {user.roles.map((role) => toDisplayRoleName(role.name)).join(", ")}
+                            <td className={`px-4 py-3 text-sm font-medium ${toDisplayRoleName(user.role) === 'Student' ? "text-gray-500" : "text-green-500"}`} >
+                                {toDisplayRoleName(user.role)}
                             </td>
                             <td className="px-4 py-3 text-sm">
                                 <span

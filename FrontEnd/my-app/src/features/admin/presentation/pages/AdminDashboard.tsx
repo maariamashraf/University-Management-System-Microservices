@@ -33,15 +33,15 @@ export function AdminDashboard() {
     const activeCourses = data?.courses.length ?? 0;
     const numberOfStudents =
         data?.users.filter((user) =>
-            user.roles.some((role) => role.name.toLowerCase().includes("student"))
+            user.role.toLowerCase().includes("student")
         ).length ?? 0;
     const numberOfTeachers =
         data?.users.filter((user) =>
-            user.roles.some((role) => role.name.toLowerCase().includes("teacher"))
+            user.role.toLowerCase().includes("teacher")
         ).length ?? 0;
     const numberOfAdmins =
         data?.users.filter((user) =>
-            user.roles.some((role) => role.name.toLowerCase().includes("admin"))
+            user.role.toLowerCase().includes("admin")
         ).length ?? 0;
     const securityIncidentLogs = useMemo(() => {
         return (data?.auditLogs ?? []).filter((log) => {
