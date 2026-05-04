@@ -1,4 +1,4 @@
-import { decodeToken, getToken } from "./authService";
+import { decodeToken, getToken, getTokenRoles } from "./authService";
 import { getTeacherDetails } from "./teacherService";
 import { getStudentInfo } from "./studentService";
 import type { Student } from "../Interfaces/student";
@@ -15,7 +15,7 @@ function normalizeRole(role: string): string {
 
 export function getRole(): "teacher" | "student" | "admin" {
     try {
-        const { roles } = jwtDecode<MyTokenPayload>(getToken() ?? "");
+        const roles = getTokenRoles(getToken() ?? "");
         if (roles.some((role) => normalizeRole(role) === "admin")) return "admin";
         return roles.some((role) => normalizeRole(role) === "teacher") ? "teacher" : "student";
     } catch {
@@ -75,7 +75,8 @@ export async function getUserDashboardData(token: string): Promise<Student | Tea
     const decoded = await decodeToken(token);
     const userId = decoded.userId;
      console.log("Decoded token:", decoded);
-    if (decoded.roles.some((role) => normalizeRole(role) === "admin")) {
+    const roles = getTokenRoles(token);
+    if (roles.some((role) => normalizeRole(role) === "admin")) {
         return {
             role: "admin",
             id: userId,
@@ -84,7 +85,7 @@ export async function getUserDashboardData(token: string): Promise<Student | Tea
         };
     }
 
-    if (decoded.roles.some((role) => normalizeRole(role) === "teacher")) {
+    if (roles.some((role) => normalizeRole(role) === "teacher")) {
         const data = await getTeacherDetails(userId);
         console.log("Teacher data:", data);
         return { ...data, role: "teacher" } as Teacher;

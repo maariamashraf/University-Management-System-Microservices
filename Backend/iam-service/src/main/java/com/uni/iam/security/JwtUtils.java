@@ -7,19 +7,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
-
-/**
- * SECURITY LAYER
- * Handles JWT generation and validation.
- * Used by AuthService (issuance) and JwtAuthFilter (validation).
- *
- * The secret comes from application.properties → jwt.secret
- * In production this should be sourced from a secrets manager / env variable.
- */
 @Slf4j
 @Component
 public class JwtUtils {
@@ -42,14 +32,14 @@ public class JwtUtils {
     public String generateToken(Authentication authentication) {
         UserDetails userPrincipal = (UserDetails) authentication.getPrincipal();
         CustomUserDetails customUserDetails = (CustomUserDetails) userPrincipal;
-        String roles = userPrincipal.getAuthorities().stream()
-                .map(a -> a.getAuthority())
-                .findFirst()
-                .orElse("");
+        // Collect all granted authorities as a list so the JWT carries roles as an array
+        java.util.List<String> roles = userPrincipal.getAuthorities().stream()
+            .map(a -> a.getAuthority())
+            .toList();
 
         return Jwts.builder()
-                .setSubject(userPrincipal.getUsername())
-                .claim("roles", roles)
+            .setSubject(userPrincipal.getUsername())
+            .claim("roles", roles)
             .claim("userId", customUserDetails.getId())
             .claim("userName", customUserDetails.getUsername())
             .claim("email", customUserDetails.getEmail())
@@ -67,8 +57,16 @@ public class JwtUtils {
         return parseClaims(token).getSubject();
     }
 
-    public String getRolesFromToken(String token) {
-        return (String) parseClaims(token).get("roles");
+    @SuppressWarnings("unchecked")
+    public java.util.List<String> getRolesFromToken(String token) {
+        Object claim = parseClaims(token).get("roles");
+        if (claim instanceof java.util.List) {
+            return (java.util.List<String>) claim;
+        }
+        if (claim instanceof String) {
+            return java.util.List.of((String) claim);
+        }
+        return java.util.Collections.emptyList();
     }
 
     public boolean validateToken(String token) {

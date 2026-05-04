@@ -17,7 +17,7 @@ export interface AuthContextType {
     register: (email: string, password: string, username: string, teacherCode?: string) => Promise<void>;
 }
 export interface MyTokenPayload {
-    roles: string[];
+    roles?: string[] | string;
     userName?: string;
     email?: string;
     userId: number;

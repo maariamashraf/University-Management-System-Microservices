@@ -26,6 +26,21 @@ export function getUserName(): string {
   const decoded = jwtDecode<MyTokenPayload>(token);
   return decoded.userName ?? decoded.sub;
 }
+
+export function getTokenRoles(token: string): string[] {
+  try {
+    const decoded = jwtDecode<MyTokenPayload>(token);
+    const roles = decoded.roles;
+    if (!roles) return [];
+    return Array.isArray(roles) ? roles : [roles];
+  } catch {
+    return [];
+  }
+}
+
+function normalizeRole(role: string): string {
+  return role.replace(/^ROLE_/, "").toLowerCase();
+}
 export function setToken(token: string) {
   localStorage.setItem(Token, token);
 }
@@ -51,14 +66,9 @@ export function setUserPermissions(permissions: string[]) {
 export function IsAdmin(): boolean {
   const token = getToken();
   if (!token) return false;
-  const decoded = jwtDecode<MyTokenPayload>(token);
-  return (decoded.roles ?? []).some((role) =>
-    role.toLowerCase().includes("admin"),
+  return getTokenRoles(token).some((role) =>
+    normalizeRole(role).includes("admin"),
   );
-}
-
-function normalizeRole(role: string): string {
-  return role.replace(/^ROLE_/, "").toLowerCase();
 }
 
 export function getUserPermissions(): string[] {
@@ -156,18 +166,21 @@ export async function HandleLogin(email: string, password: string) {
 }
 
 export async function decodeToken(token: string) {
-  const decoded = jwtDecode<MyTokenPayload>(token);
-  return decoded;
+  try {
+    const decoded = jwtDecode<MyTokenPayload>(token) as MyTokenPayload;
+    const roles = decoded.roles;
+    decoded.roles = Array.isArray(roles) ? roles : roles ? [roles] : [];
+    return decoded;
+  } catch {
+    return { roles: [], userId: 0, sub: "", iat: 0, exp: 0 } as MyTokenPayload;
+  }
 }
 
 export function getPostLoginRedirectPath(token?: string | null): string {
   if (!token) return "/dashboard";
 
   try {
-    const decoded = jwtDecode<MyTokenPayload>(token);
-    if (
-      (decoded.roles ?? []).some((role) => normalizeRole(role) === "admin")
-    ) {
+    if (getTokenRoles(token).some((role) => normalizeRole(role) === "admin")) {
       return "/dashboard/admin/users-permissions";
     }
   } catch {
