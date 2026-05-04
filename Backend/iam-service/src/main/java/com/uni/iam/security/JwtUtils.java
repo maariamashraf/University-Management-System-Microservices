@@ -41,6 +41,7 @@ public class JwtUtils {
      */
     public String generateToken(Authentication authentication) {
         UserDetails userPrincipal = (UserDetails) authentication.getPrincipal();
+        CustomUserDetails customUserDetails = (CustomUserDetails) userPrincipal;
         String roles = userPrincipal.getAuthorities().stream()
                 .map(a -> a.getAuthority())
                 .findFirst()
@@ -49,7 +50,9 @@ public class JwtUtils {
         return Jwts.builder()
                 .setSubject(userPrincipal.getUsername())
                 .claim("roles", roles)
-                .claim("userId", ((CustomUserDetails) userPrincipal).getId())
+            .claim("userId", customUserDetails.getId())
+            .claim("userName", customUserDetails.getUsername())
+            .claim("email", customUserDetails.getEmail())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)

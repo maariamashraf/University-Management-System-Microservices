@@ -18,7 +18,8 @@ export interface AuthContextType {
 }
 export interface MyTokenPayload {
     roles: string[];
-    userName: string;
+    userName?: string;
+    email?: string;
     userId: number;
     sub: string;     
     iat: number;       

@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
  *
  * Endpoints:
  *   POST /api/auth/register  → register a new user, returns JWT
- *   POST /api/auth/login     → authenticate, returns JWT
+ *   POST /api/auth/login     → authenticate with email + password, returns JWT
  *
  * This layer only:
  *   • Receives HTTP requests

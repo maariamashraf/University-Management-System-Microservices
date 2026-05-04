@@ -17,12 +17,16 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final UserRepository userRepository;
 
+    /**
+     * Spring Security still names this {@code loadUserByUsername}, but the credential
+     * we pass from {@code UsernamePasswordAuthenticationToken} is the user's email.
+     */
     @Override
     @Transactional(readOnly = true)
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+        User user = userRepository.findByEmail(email.trim())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
 
         SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + user.getRole().name());
 

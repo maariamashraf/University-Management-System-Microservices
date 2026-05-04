@@ -48,7 +48,7 @@ public class AuthServiceImpl implements AuthService {
         log.info("Registered new user: {} with role: {}", user.getUsername(), user.getRole());
 
         Authentication auth = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
+                new UsernamePasswordAuthenticationToken(request.getEmail().trim(), request.getPassword())
         );
 
         String token = jwtUtils.generateToken(auth);
@@ -61,11 +61,12 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponse login(LoginRequest request) {
+        String email = request.getEmail().trim();
         Authentication auth = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
+                new UsernamePasswordAuthenticationToken(email, request.getPassword())
         );
 
-        User user = userRepository.findByUsername(request.getUsername())
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found after authentication"));
 
         String token = jwtUtils.generateToken(auth);

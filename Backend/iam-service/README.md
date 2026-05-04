@@ -63,7 +63,7 @@ This microservice handles user identities, authentication, authorization, and ba
 | Method | Endpoint | Description | Access |
 |---|---|---|---|
 | POST | `/api/auth/register` | Register a new User. **Note: ADMIN role requires existing ADMIN auth.** | Public* |
-| POST | `/api/auth/login` | Authenticate and retrieve JWT (returns `token`, `userId`, `username`) | Public |
+| POST | `/api/auth/login` | Authenticate with **email** + password; returns JWT (`token`, `userId`, `username`) | Public |
 
 ### User Management
 | Method | Endpoint | Description | Access |

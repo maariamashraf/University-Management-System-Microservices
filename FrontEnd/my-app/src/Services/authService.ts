@@ -23,7 +23,8 @@ export function getUserId(): number {
 export function getUserName(): string {
   const token = getToken();
   if (!token) throw new Error("No token found");
-  return jwtDecode<MyTokenPayload>(token).userName;
+  const decoded = jwtDecode<MyTokenPayload>(token);
+  return decoded.userName ?? decoded.sub;
 }
 export function setToken(token: string) {
   localStorage.setItem(Token, token);
@@ -52,8 +53,12 @@ export function IsAdmin(): boolean {
   if (!token) return false;
   const decoded = jwtDecode<MyTokenPayload>(token);
   return (decoded.roles ?? []).some((role) =>
-    role.toLowerCase().includes("Admin"),
+    role.toLowerCase().includes("admin"),
   );
+}
+
+function normalizeRole(role: string): string {
+  return role.replace(/^ROLE_/, "").toLowerCase();
 }
 
 export function getUserPermissions(): string[] {
@@ -161,7 +166,7 @@ export function getPostLoginRedirectPath(token?: string | null): string {
   try {
     const decoded = jwtDecode<MyTokenPayload>(token);
     if (
-      (decoded.roles ?? []).some((role) => role.toUpperCase().includes("Admin"))
+      (decoded.roles ?? []).some((role) => normalizeRole(role) === "admin")
     ) {
       return "/dashboard/admin/users-permissions";
     }
