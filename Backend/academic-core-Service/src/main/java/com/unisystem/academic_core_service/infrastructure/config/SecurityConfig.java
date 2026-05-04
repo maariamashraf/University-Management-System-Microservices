@@ -11,19 +11,17 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig {
 
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/actuator/health", "/actuator/info").permitAll()
-                    .requestMatchers("/api/courses/popular").permitAll()
-                    .requestMatchers("/api/departments/all").permitAll()
-                    .requestMatchers("/api/feedbacks/recent").permitAll()
-                .anyRequest().authenticated()
-            )
-        .addFilterBefore(new AuthFiltter(), UsernamePasswordAuthenticationFilter.class);
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/actuator/health", "/actuator/info").permitAll()
+                        .requestMatchers("/api/courses/popular").permitAll()
+                        .requestMatchers("/api/departments/all").permitAll()
+                        .requestMatchers("/api/feedbacks/recent").permitAll()
+                        .anyRequest().authenticated())
+                .addFilterBefore(new AuthFiltter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 }

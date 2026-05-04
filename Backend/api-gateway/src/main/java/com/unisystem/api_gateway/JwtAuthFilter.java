@@ -44,17 +44,17 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
         String path = exchange.getRequest().getURI().getPath();
 
         // Allow public endpoints to pass through without a token
-        if if (PUBLIC.stream().anyMatch(path::startsWith)) {
-    // Strip identity headers even on public routes to prevent client spoofing
-    ServerHttpRequest stripped = exchange.getRequest().mutate()
-            .headers(h -> {
-                h.remove("X-User-Id");
-                h.remove("X-Username");
-                h.remove("X-Roles");
-            })
-            .build();
-    return chain.filter(exchange.mutate().request(stripped).build());
-}
+        if (PUBLIC.stream().anyMatch(path::startsWith)) {
+            // Strip identity headers even on public routes to prevent client spoofing
+            ServerHttpRequest stripped = exchange.getRequest().mutate()
+                    .headers(h -> {
+                        h.remove("X-User-Id");
+                        h.remove("X-Username");
+                        h.remove("X-Roles");
+                    })
+                    .build();
+            return chain.filter(exchange.mutate().request(stripped).build());
+        }
 
         String auth = exchange.getRequest().getHeaders().getFirst("Authorization");
 
@@ -82,16 +82,16 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
 
             // Inject validated claims as headers for downstream services
             // Strip client-supplied identity headers first, then inject validated ones
-ServerHttpRequest mutated = exchange.getRequest().mutate()
-        .headers(h -> {
-            h.remove("X-User-Id");
-            h.remove("X-Username");
-            h.remove("X-Roles");
-        })
-        .header("X-User-Id",  userId != null ? userId.toString() : "")
-        .header("X-Username", claims.getSubject())
-        .header("X-Roles",    roles  != null ? roles.toString()  : "")
-        .build();
+            ServerHttpRequest mutated = exchange.getRequest().mutate()
+                    .headers(h -> {
+                        h.remove("X-User-Id");
+                        h.remove("X-Username");
+                        h.remove("X-Roles");
+                    })
+                    .header("X-User-Id",  userId != null ? userId.toString() : "")
+                    .header("X-Username", claims.getSubject())
+                    .header("X-Roles",    roles  != null ? roles.toString()  : "")
+                    .build();
 
             return chain.filter(exchange.mutate().request(mutated).build());
 

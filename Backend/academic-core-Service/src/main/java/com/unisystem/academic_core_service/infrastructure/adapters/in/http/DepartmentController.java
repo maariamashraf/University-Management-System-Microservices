@@ -42,6 +42,8 @@ public class DepartmentController {
         return ResponseEntity.ok(departmentJpaRepository.findByNameIgnoreCase(name));
     }
 
+
+
     private String normalizeDepartmentName(String name) {
         String normalized = name.trim().replace(' ', '_');
         try {

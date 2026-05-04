@@ -22,9 +22,9 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "username")
+    @Column(name = "username", nullable = false, length = 50, insertable = false, updatable = false)
     private String userName;
 
-    @Column
+    @Column(nullable = false, length = 255, insertable = false, updatable = false)
     private String email;
 }

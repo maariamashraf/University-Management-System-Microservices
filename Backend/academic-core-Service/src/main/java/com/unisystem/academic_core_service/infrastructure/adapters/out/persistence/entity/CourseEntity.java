@@ -24,10 +24,10 @@ public class CourseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 255)
     private String name;
 
-    @Column(name = "course_code", nullable = false, unique = true)
+    @Column(name = "course_code", nullable = false, unique = true, length = 255)
     private String courseCode;
 
     @Column(columnDefinition = "TEXT")

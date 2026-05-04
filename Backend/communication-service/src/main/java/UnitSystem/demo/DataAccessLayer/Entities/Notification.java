@@ -23,7 +23,7 @@ public class Notification {
     @JoinColumn(name = "user_id", nullable = false)
     private User recipient;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 255)
     private String title;
 
     @Column(nullable = false, columnDefinition = "TEXT")

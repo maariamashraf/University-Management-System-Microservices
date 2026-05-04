@@ -23,7 +23,7 @@ public class Course {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name")
+    @Column(name = "name", nullable = false, length = 255, insertable = false, updatable = false)
     private String name;
 
     @OneToMany(mappedBy = "course", fetch = FetchType.LAZY)

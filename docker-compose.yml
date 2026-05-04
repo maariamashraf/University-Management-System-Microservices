@@ -129,6 +129,31 @@ services:
       timeout: 5s
       retries: 10
 
+  db-init:
+    image: mysql:8.0.33
+    container_name: db-init
+    networks: [ unisystem-net ]
+    depends_on:
+      shared-db:
+        condition: service_healthy
+    environment:
+      MYSQL_ROOT_PASSWORD: "01125867988"
+    volumes:
+      - ./init.sql:/init.sql:ro
+    entrypoint: [ "/bin/sh", "-c" ]
+    command:
+      - |
+        set -e
+        schema_exists=$(mysql --host=shared-db --port=3306 --user=root --password="$$MYSQL_ROOT_PASSWORD" --skip-column-names --silent -e "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='helwanuni' AND table_name='users';")
+        if [ "$$schema_exists" -gt 0 ]; then
+          echo 'Database schema already exists; skipping bootstrap.'
+          exit 0
+        fi
+        echo 'Running database bootstrap...'
+        mysql --host=shared-db --port=3306 --user=root --password="$$MYSQL_ROOT_PASSWORD" --database=helwanuni < /init.sql
+        echo 'Database bootstrap finished.'
+    restart: "no"
+
   # ══════════════════════════════════════════
   #  EUREKA SERVER
   # ══════════════════════════════════════════
@@ -147,7 +172,8 @@ services:
       EUREKA_CLIENT_REGISTER_WITH_EUREKA: 'false'
       EUREKA_CLIENT_FETCH_REGISTRY: 'false'
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8761/actuator/health" ]
+      # تم تعديل Healthcheck هنا ليعمل بـ wget المضمون
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8761/actuator/health || exit 1"]
       interval: 15s
       timeout: 10s
       retries: 8
@@ -174,11 +200,11 @@ services:
       SERVER_PORT: 8080
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka
       EUREKA_INSTANCE_PREFER_IP_ADDRESS: 'true'
-      JWT_SECRET: ${JWT_SECRET:-local-development-secret-change-me-minimum-thirty-two-char}
+      JWT_SECRET: mySuperSecretKey2026UniSystemXYZ!
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_REDIS_PORT: 6379
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8080/actuator/health || exit 1"]
       interval: 15s
       timeout: 10s
       retries: 5
@@ -198,6 +224,8 @@ services:
     depends_on:
       shared-db:
         condition: service_healthy
+      db-init:
+        condition: service_completed_successfully
       eureka-server:
         condition: service_healthy
     environment:
@@ -209,13 +237,11 @@ services:
       SPRING_JPA_HIBERNATE_DDL_AUTO: validate
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka
       EUREKA_INSTANCE_PREFER_IP_ADDRESS: 'true'
-      SPRING_FLYWAY_ENABLED: "true"
-      SPRING_FLYWAY_BASELINE_ON_MIGRATE: "true"
-      SPRING_FLYWAY_BASELINE_VERSION: "0"
-      JWT_SECRET: ${JWT_SECRET:-local-development-secret-change-me-minimum-thirty-two-char}
+      SPRING_FLYWAY_ENABLED: "false"
+      JWT_SECRET: mySuperSecretKey2026UniSystemXYZ!
       JWT_EXPIRATION_MS: 86400000
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8081/actuator/health" ]
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8081/actuator/health || exit 1"]
       interval: 15s
       timeout: 10s
       retries: 8
@@ -235,6 +261,8 @@ services:
     depends_on:
       shared-db:
         condition: service_healthy
+      db-init:
+        condition: service_completed_successfully
       kafka:
         condition: service_healthy
       eureka-server:
@@ -248,13 +276,14 @@ services:
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: "01125867988"
       SPRING_JPA_HIBERNATE_DDL_AUTO: validate
+      SPRING_FLYWAY_ENABLED: "false"
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_REDIS_PORT: 6379
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka
       EUREKA_INSTANCE_PREFER_IP_ADDRESS: 'true'
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8082/actuator/health" ]
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8082/actuator/health || exit 1"]
       interval: 15s
       timeout: 10s
       retries: 8
@@ -274,6 +303,8 @@ services:
     depends_on:
       shared-db:
         condition: service_healthy
+      db-init:
+        condition: service_completed_successfully
       kafka:
         condition: service_healthy
       eureka-server:
@@ -291,12 +322,12 @@ services:
       SPRING_JPA_HIBERNATE_DDL_AUTO: validate
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       SPRING_KAFKA_CONSUMER_GROUP_ID: communication-group
-      SPRING_FLYWAY_ENABLED: 'true'
-      JWT_SECRET: ${JWT_SECRET:-local-development-secret-change-me-minimum-thirty-two-char}
+      SPRING_FLYWAY_ENABLED: 'false'
+      JWT_SECRET: mySuperSecretKey2026UniSystemXYZ!
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka
       EUREKA_INSTANCE_PREFER_IP_ADDRESS: 'true'
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8083/actuator/health" ]
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8083/actuator/health || exit 1"]
       interval: 15s
       timeout: 10s
       retries: 8

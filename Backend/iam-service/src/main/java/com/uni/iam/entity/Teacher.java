@@ -13,7 +13,7 @@ import java.math.BigDecimal;
  */
 @Entity
 @Table(name = "teachers")
-@PrimaryKeyJoinColumn(name = "id", referencedColumnName = "id")
+@PrimaryKeyJoinColumn(name = "user_id", referencedColumnName = "id")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -22,7 +22,7 @@ import java.math.BigDecimal;
 @ToString(callSuper = true)
 public class Teacher extends User {
 
-    @Column(name = "office_location")
+    @Column(name = "office_location", length = 50)
     private String officeLocation;
 
     @Column(name = "salary", precision = 10, scale = 2)

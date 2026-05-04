@@ -8,11 +8,6 @@ import reactor.core.publisher.Mono;
 @Configuration
 public class RateLimiterConfig {
 
-    /**
-     * Rate-limit by IP address.
-     * Falls back to "anonymous" if the remote address is unavailable
-     * so the limiter never gets a null key (which causes it to deny all requests).
-     */
     @Bean
     public KeyResolver ipKeyResolver() {
         return exchange -> {
