@@ -2,7 +2,6 @@ import axios from "axios";
 import { getAuthHeaders } from "./config";
 import { ApiUrl } from "./config";
 import type { CourseRequest } from "../Interfaces/course";
-import { assertPermission } from "./authService";
 export function getBackgroundColor(department: string) {
     switch (department) {
         case "Computer_Science":
@@ -125,7 +124,6 @@ export async function createCourse(course: CourseRequest) {
 }
 export async function updateCourse(id:number, course: CourseRequest) {
     try {
-        assertPermission("update_course");
         console.log("Updating course with id:", id, "and data:", course);
         const response = await axios.put(`${ApiUrl}/api/courses/${id}`, course, {
             headers: getAuthHeaders(),
@@ -147,7 +145,6 @@ export async function updateCourse(id:number, course: CourseRequest) {
 
 export async function deleteCourse(id:number) {
     try {
-        assertPermission("delete_course");
         const response = await axios.delete(`${ApiUrl}/api/courses/${id}`, {
             headers: getAuthHeaders(),
         });
