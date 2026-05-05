@@ -8,6 +8,7 @@ import java.util.Optional;
 public interface CourseRepositoryPort {
     Course save(Course course);
     Optional<Course> findById(Long id);
+    List<Course> findByIds(List<Long> ids);
     List<Course> findAll();
     List<Course> findPopular(int topN);
     void deleteById(Long id);

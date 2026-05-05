@@ -41,6 +41,12 @@ public class CourseController {
         return ResponseEntity.ok(courses);
     }
 
+    @PostMapping("/by-ids")
+    public ResponseEntity<List<Course>> getCoursesByIds(@RequestBody CourseIdsRequest request) {
+        List<Long> ids = request == null ? List.of() : request.ids();
+        return ResponseEntity.ok(getCoursesQuery.findByIds(ids));
+    }
+
     @GetMapping("/popular")
     public ResponseEntity<List<Course>> getPopularCourses(
             @RequestParam(defaultValue = "8") int limit
@@ -66,5 +72,8 @@ public class CourseController {
     public ResponseEntity<List<Course>> getCoursesByDepartmentName(@PathVariable String departmentName) {
         List<Course> courses = getCoursesQuery.findByDepartmentName(departmentName);
         return ResponseEntity.ok(courses);
+    }
+
+    public record CourseIdsRequest(List<Long> ids) {
     }
 }

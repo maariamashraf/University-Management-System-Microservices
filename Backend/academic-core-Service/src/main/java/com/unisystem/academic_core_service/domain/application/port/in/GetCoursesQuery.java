@@ -8,6 +8,7 @@ import java.util.Optional;
 public interface GetCoursesQuery {
     List<Course> findAll();
     Optional<Course> findById(Long courseId);
+    List<Course> findByIds(List<Long> courseIds);
     List<Course> findByTeacherName(String teacherName);
     List<Course> findByTeacherId(Long TeacherId);
     Optional<Course> findByCourseName(String courseName);

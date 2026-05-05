@@ -1,5 +1,4 @@
 package com.uni.iam.service.impl;
-
 import com.uni.iam.client.AcademicCoreClient;
 import com.uni.iam.dto.response.AnnouncementSummaryResponse;
 import com.uni.iam.dto.response.EnrolledCourseResponse;

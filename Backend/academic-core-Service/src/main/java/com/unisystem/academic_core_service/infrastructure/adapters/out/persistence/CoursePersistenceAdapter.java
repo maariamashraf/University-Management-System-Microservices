@@ -49,6 +49,14 @@ public class CoursePersistenceAdapter implements CourseRepositoryPort {
     }
 
     @Override
+    public List<Course> findByIds(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return List.of();
+        }
+        return courseJpaRepository.findAllById(ids).stream().map(coursePersistenceMapper::toDomain).toList();
+    }
+
+    @Override
     @Cacheable(cacheNames = CacheConfig.COURSES_ALL_CACHE)
     public List<Course> findAll() {
         return courseJpaRepository.findAll().stream().map(coursePersistenceMapper::toDomain).toList();

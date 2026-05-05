@@ -9,6 +9,19 @@ import { toast } from "sonner";
 import {ApiUrl,getAuthHeaders} from "./config"
 import axios from "axios";
 
+/**
+ * BFF (Backend for Frontend) Pattern Implementation
+ * 
+ * This service module implements the BFF pattern where:
+ * 1. All frontend requests go through the API Gateway at /api/gateway/dashboard/*
+ * 2. The gateway routes requests to appropriate backend services
+ * 3. The gateway can aggregate and transform data before returning to frontend
+ * 4. Frontend only knows about one endpoint (the gateway)
+ * 
+ * Service Flow:
+ * Frontend → API Gateway (/api/gateway/dashboard/*) → Backend Services → API Gateway → Frontend
+ */
+
 function normalizeRole(role: string): string {
     return role.replace(/^ROLE_/, "").toLowerCase();
 }

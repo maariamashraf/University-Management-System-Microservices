@@ -34,6 +34,14 @@ public class GetCoursesService implements GetCoursesQuery {
     }
 
     @Override
+    public List<Course> findByIds(List<Long> courseIds) {
+        if (courseIds == null || courseIds.isEmpty()) {
+            return List.of();
+        }
+        return courseRepository.findByIds(courseIds);
+    }
+
+    @Override
 
     public List<Course> findByTeacherName(String teacherName) {
         return courseRepository.findByTeacherName(teacherName);
