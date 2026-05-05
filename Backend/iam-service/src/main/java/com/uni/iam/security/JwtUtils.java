@@ -20,15 +20,7 @@ public class JwtUtils {
     @Value("${jwt.expiration-ms}")
     private long jwtExpirationMs;
 
-    // ─────────────────────────────────────────────
-    // Token generation
-    // ─────────────────────────────────────────────
-
-    /**
-     * Generate a signed JWT after successful authentication.
-     * Embeds username + role as claims so downstream services
-     * can read them from the X-Roles header injected by the gateway.
-     */
+  
     public String generateToken(Authentication authentication) {
         UserDetails userPrincipal = (UserDetails) authentication.getPrincipal();
         CustomUserDetails customUserDetails = (CustomUserDetails) userPrincipal;
