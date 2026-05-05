@@ -1,5 +1,6 @@
 package com.unisystem.academic_core_service.infrastructure.config;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.unisystem.academic_core_service.domain.application.port.in.CreateAnnouncementUseCase;
 import com.unisystem.academic_core_service.domain.application.port.in.CreateCourseUseCase;
 import com.unisystem.academic_core_service.domain.application.port.in.EnrollStudentUseCase;
@@ -71,6 +72,12 @@ public class BeanConfig {
         return new GetAnnouncementsService(announcementRepositoryPort);
     }
 
-
+@Bean
+public ObjectMapper objectMapper() {
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.registerModule(new JavaTimeModule());
+    mapper.disable(com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    return mapper;
+}
 
 }

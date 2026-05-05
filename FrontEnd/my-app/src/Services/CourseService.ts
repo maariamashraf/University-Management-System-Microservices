@@ -104,7 +104,8 @@ export async function getCourseById(courseId: number) {
 
 export async function createCourse(course: CourseRequest) {
     try {
-        assertPermission("create_course");
+        console.log("Creating course with data:", course);
+        console.log("url : ", `${ApiUrl}/api/courses`);
         const response = await axios.post(`${ApiUrl}/api/courses`, course, {
             headers: getAuthHeaders(),
         });
