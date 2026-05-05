@@ -61,6 +61,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponse login(LoginRequest request) {
+        log.info("Attempting login for email: {}", request.getEmail());
         String email = request.getEmail().trim();
         Authentication auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(email, request.getPassword())

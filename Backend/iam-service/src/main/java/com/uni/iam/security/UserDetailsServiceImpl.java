@@ -23,10 +23,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
      */
     @Override
     @Transactional(readOnly = true)
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String emailOrUsername) throws UsernameNotFoundException {
 
-        User user = userRepository.findByEmail(email.trim())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+        String identifier = emailOrUsername.trim();
+        User user = userRepository.findByEmail(identifier)
+                .orElseGet(() -> userRepository.findByUsername(identifier)
+                        .orElseThrow(() -> new UsernameNotFoundException("User not found with email or username: " + identifier)));
 
         SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + user.getRole().name());
 

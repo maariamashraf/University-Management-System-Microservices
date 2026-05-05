@@ -22,6 +22,7 @@ interface StudentBffResponse {
  */
 export async function getStudentInfo(_id: number): Promise<Student> {
     try {
+        console.log(`Fetching student info for ID ${_id} via BFF endpoint`);
         // Updated to use BFF endpoint through API Gateway
         const response = await axios.get<StudentBffResponse>(`${ApiUrl}/api/gateway/dashboard/student/${_id}`, {
             headers: getAuthHeaders(),
@@ -31,8 +32,9 @@ export async function getStudentInfo(_id: number): Promise<Student> {
     } catch (error) {
         if (axios.isAxiosError(error)) {
             if (error.response) {
-                console.log("error.response", error.response.data);
-                throw new Error(error.response.data.message || "Student info failed");
+               console.error("Backend Error Detail:", error.response.data); 
+    const serverMessage = error.response.data.message || error.response.data.error || "Student info failed";
+    throw new Error(serverMessage);
             }
             if (error.request) {
                 console.log("error.request", error.request);
