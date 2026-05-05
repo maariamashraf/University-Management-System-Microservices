@@ -7,7 +7,10 @@ import type { User, UserPermission, UserPermissionRequest, UserTypeFilter } from
 import { userService } from "../../infrastructure/services/UserService";
 import { permissionService } from "../../infrastructure/services/PermissionService";
 import { getRole } from "../../../../Services/userService";
-function normalizeRole(role: string): string {
+function normalizeRole(role?: string): string {
+    if (!role || typeof role !== 'string') {
+        return "";
+    }
     return role.replace(/^ROLE_/, "").toLowerCase();
 }
 

@@ -7,7 +7,7 @@ export function useGetAllCourses() {
         queryKey: ["allCourses"],
         queryFn: getAllCourses,
     });
-    console.log("data",data);
+    console.log("data of all courses ",data);
     return {
         courses: data || [],
         isLoading,

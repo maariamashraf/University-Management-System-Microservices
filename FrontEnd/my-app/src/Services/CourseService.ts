@@ -104,6 +104,7 @@ export async function getCourseById(courseId: number) {
 export async function createCourse(course: CourseRequest) {
     try {
         console.log("Creating course with data:", course);
+
         console.log("url : ", `${ApiUrl}/api/courses`);
         const response = await axios.post(`${ApiUrl}/api/courses`, course, {
             headers: getAuthHeaders(),
@@ -112,12 +113,15 @@ export async function createCourse(course: CourseRequest) {
     }catch(error){
         if(axios.isAxiosError(error)){
             if(error.response){
+                console.error("Error response:", error.response.data);
                 throw new Error(error.response.data.message);
             }   
             if(error.request){
+                console.error("No response received:", error.request);
                 throw new Error("No response from server");
             }
         }
+        console.error("Error creating course:", error);
         throw new Error("Error creating course");
     }
 

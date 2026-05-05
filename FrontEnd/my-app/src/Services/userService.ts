@@ -23,7 +23,7 @@ import axios from "axios";
  */
 
 function normalizeRole(role?: string): string {
-    if (!role) {
+    if (!role || typeof role !== 'string') {
         return "";
     }
     return role.replace(/^ROLE_/, "").toLowerCase();

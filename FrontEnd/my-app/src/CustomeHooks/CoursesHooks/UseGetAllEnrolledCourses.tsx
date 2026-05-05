@@ -12,6 +12,7 @@ export function useGetAllEnrolledCourses() {
     if(error){
     console.error("Error fetching enrolled courses:", error instanceof Error ? error.message : error);
     }
+    console.log("data of enrolled courses ",data);
     return {
         enrolledCourses: data || [],
         isLoading,

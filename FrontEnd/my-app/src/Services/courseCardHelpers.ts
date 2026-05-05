@@ -31,7 +31,7 @@ export const DEPT_ICON: Record<string, string> = {
 };
 
 export function deptLabel(dept?: string): string {
-    if (!dept) {
+    if (!dept || typeof dept !== 'string') {
         return "";
     }
     return dept.replace(/_/g, " ");

@@ -45,7 +45,7 @@ export function getTokenRoles(token: string): string[] {
 }
 
 function normalizeRole(role?: string): string {
-  if (!role) {
+  if (!role || typeof role !== 'string') {
     return "";
   }
   return role.replace(/^ROLE_/, "").toLowerCase();

@@ -3,6 +3,7 @@ import AllCourses from "../../components/Courses/AllCourses";
 import { DEPARTMENT_OPTIONS } from "../../constants/departments";
 
 export default function Registration() {
+    console.log("this log from regstration page");
     const [search, setSearch] = useState("");
     const [department, setDepartment] = useState("all");
 
