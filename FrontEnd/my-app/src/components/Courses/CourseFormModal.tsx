@@ -16,7 +16,7 @@ interface Props {
 
 const EMPTY: Omit<CourseRequest, "userId"> = {
     name: "", description: "", courseCode: "",
-    startDate: new Date(), endDate: new Date(),
+    startDate: toInputDate(new Date()), endDate: toInputDate(new Date()),
     departmentName: "", creditHours: 3, maxStudents: 30,
 };
 
@@ -29,8 +29,8 @@ export function CourseFormModal({ isOpen, onClose, onSubmit, isPending, editCour
                 name:           editCourse.name,
                 description:    editCourse.description,
                 courseCode:     editCourse.courseCode,
-                startDate:      new Date(editCourse.startDate),
-                endDate:        new Date(editCourse.endDate),
+                startDate:      toInputDate(editCourse.startDate),
+                endDate:        toInputDate(editCourse.endDate),
                 departmentName: editCourse.department,
                 creditHours:    editCourse.credits,
                 maxStudents:    editCourse.maxStudents,
@@ -49,7 +49,7 @@ export function CourseFormModal({ isOpen, onClose, onSubmit, isPending, editCour
     }
 
     function handleDateChange(field: "startDate" | "endDate", value: string) {
-        setForm(prev => ({ ...prev, [field]: new Date(value) }));
+        setForm(prev => ({ ...prev, [field]: value }));
     }
 
     function handleSubmit(e: React.FormEvent) {
@@ -138,11 +138,11 @@ export function CourseFormModal({ isOpen, onClose, onSubmit, isPending, editCour
                                 <div className="grid grid-cols-2 gap-3">
                                     <div>
                                         <label className={labelCls}>Start Date *</label>
-                                        <input type="date" required value={toInputDate(form.startDate)} onChange={e => handleDateChange("startDate", e.target.value)} className={inputCls} />
+                                        <input type="date" required value={form.startDate} onChange={e => handleDateChange("startDate", e.target.value)} className={inputCls} />
                                     </div>
                                     <div>
                                         <label className={labelCls}>End Date *</label>
-                                        <input type="date" required value={toInputDate(form.endDate)} onChange={e => handleDateChange("endDate", e.target.value)} className={inputCls} />
+                                        <input type="date" required value={form.endDate} onChange={e => handleDateChange("endDate", e.target.value)} className={inputCls} />
                                     </div>
                                 </div>
 

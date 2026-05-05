@@ -18,8 +18,8 @@ export interface CourseRequest{
     name:string;
     description:string;
     courseCode:string;
-    startDate:Date;
-    endDate:Date;
+    startDate:string;
+    endDate:string;
     departmentName:string;
     userId:number;
     creditHours:number;
