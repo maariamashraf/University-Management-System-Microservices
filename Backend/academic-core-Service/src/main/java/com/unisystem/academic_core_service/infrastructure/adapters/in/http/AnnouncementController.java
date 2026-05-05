@@ -7,7 +7,6 @@ import com.unisystem.academic_core_service.infrastructure.adapters.in.http.Dto.R
 import com.unisystem.academic_core_service.infrastructure.adapters.in.http.Dto.Response.AnnouncementResponse;
 import com.unisystem.academic_core_service.infrastructure.aop.annotations.AuditLog;
 import com.unisystem.academic_core_service.infrastructure.aop.annotations.CourseTeacherOnly;
-import com.unisystem.academic_core_service.infrastructure.aop.annotations.TeachersOnly;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,7 +26,6 @@ public class AnnouncementController {
     private final CreateAnnouncementUseCase createAnnouncementUseCase;
     private final GetAnnouncementsQuery getAnnouncementsQuery;
 
-    @TeachersOnly
     @CourseTeacherOnly(bodyParam = "request")
     @AuditLog(action = "CREATE_ANNOUNCEMENT")
     @PostMapping("/create")

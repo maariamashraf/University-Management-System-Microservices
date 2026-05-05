@@ -30,7 +30,10 @@ export const DEPT_ICON: Record<string, string> = {
     "Cybersecurity":           "🛡️",
 };
 
-export function deptLabel(dept: string): string {
+export function deptLabel(dept?: string): string {
+    if (!dept) {
+        return "";
+    }
     return dept.replace(/_/g, " ");
 }
 

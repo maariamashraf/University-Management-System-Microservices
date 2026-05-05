@@ -5,7 +5,9 @@ import com.unisystem.academic_core_service.domain.application.port.in.GetCourses
 import com.unisystem.academic_core_service.domain.exceptions.CourseNotFoundException;
 import com.unisystem.academic_core_service.domain.model.Course;
 import com.unisystem.academic_core_service.infrastructure.aop.annotations.AuditLog;
-import com.unisystem.academic_core_service.infrastructure.aop.annotations.TeachersOnly;
+import com.unisystem.academic_core_service.infrastructure.adapters.in.http.Dto.Request.CreateCourseRequest;
+import com.unisystem.academic_core_service.infrastructure.adapters.out.persistence.entity.DepartmentEntity;
+import com.unisystem.academic_core_service.infrastructure.adapters.out.persistence.repository.DepartmentJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,18 +21,34 @@ public class CourseController {
 
     private final CreateCourseUseCase createCourseUseCase;
     private final GetCoursesQuery getCoursesQuery;
+    private final DepartmentJpaRepository departmentJpaRepository;
 
-    @TeachersOnly
     @AuditLog(action = "CREATE_COURSE")
     @PostMapping
-    public ResponseEntity<Course> createCourse(@RequestBody CreateCourseUseCase.CreateCourseCommand command) {
+    public ResponseEntity<Course> createCourse(
+            @RequestBody CreateCourseRequest request,
+            @RequestHeader(value = "X-User-Id", required = false) String userIdHeader) {
+        Long teacherId = resolveTeacherId(userIdHeader, request.userId());
+        Long departmentId = resolveDepartmentId(request.departmentName());
+
+        CreateCourseUseCase.CreateCourseCommand command = new CreateCourseUseCase.CreateCourseCommand(
+                request.name(),
+                request.courseCode(),
+                request.description(),
+                request.maxStudents(),
+                request.creditHours(),
+                departmentId,
+                teacherId,
+                request.startDate(),
+                request.endDate());
+
         Course course = createCourseUseCase.create(command);
         return ResponseEntity.ok(course);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Course> getCourseById(@PathVariable Long id) {
-         Course course=getCoursesQuery.findById(id)
+        Course course = getCoursesQuery.findById(id)
                 .orElseThrow(() -> new CourseNotFoundException(id));
         return ResponseEntity.ok(course);
     }
@@ -49,19 +67,18 @@ public class CourseController {
 
     @GetMapping("/popular")
     public ResponseEntity<List<Course>> getPopularCourses(
-            @RequestParam(defaultValue = "8") int limit
-    ) {
+            @RequestParam(defaultValue = "8") int limit) {
         int safeLimit = Math.max(1, Math.min(limit, 20));
         return ResponseEntity.ok(getCoursesQuery.findPopular(safeLimit));
     }
-    
+
     @GetMapping("/teacher/name/{teacherName}")
 
     public ResponseEntity<List<Course>> getCoursesByTeacherName(@PathVariable String teacherName) {
         List<Course> courses = getCoursesQuery.findByTeacherName(teacherName);
         return ResponseEntity.ok(courses);
     }
-    
+
     @GetMapping("/teacher/{teacherId}")
     public ResponseEntity<List<Course>> getCoursesByTeacherId(@PathVariable Long teacherId) {
         List<Course> courses = getCoursesQuery.findByTeacherId(teacherId);
@@ -72,6 +89,39 @@ public class CourseController {
     public ResponseEntity<List<Course>> getCoursesByDepartmentName(@PathVariable String departmentName) {
         List<Course> courses = getCoursesQuery.findByDepartmentName(departmentName);
         return ResponseEntity.ok(courses);
+    }
+
+    private Long resolveDepartmentId(String departmentName) {
+        if (departmentName == null || departmentName.isBlank()) {
+            throw new IllegalArgumentException("Department name is required");
+        }
+        List<DepartmentEntity> departments = departmentJpaRepository.findByNameIgnoreCase(departmentName.trim());
+        if (departments.isEmpty()) {
+            throw new IllegalArgumentException("Department not found: " + departmentName);
+        }
+        return departments.get(0).getId();
+    }
+
+    private Long resolveTeacherId(String userIdHeader, Long userId) {
+        Long headerId = parseLong(userIdHeader);
+        if (headerId != null) {
+            return headerId;
+        }
+        if (userId != null && userId > 0) {
+            return userId;
+        }
+        throw new IllegalArgumentException("Teacher id is required");
+    }
+
+    private Long parseLong(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        try {
+            return Long.parseLong(value.trim());
+        } catch (NumberFormatException ex) {
+            return null;
+        }
     }
 
     public record CourseIdsRequest(List<Long> ids) {

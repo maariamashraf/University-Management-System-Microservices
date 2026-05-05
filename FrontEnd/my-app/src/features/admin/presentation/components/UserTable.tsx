@@ -10,7 +10,7 @@ interface UserTableProps {
     onSelectUser: (user: User) => void;
 }
 function toDisplayRoleName(name: string): string {
-    const normalized = name.replace(/^ROLE_/, "").toLowerCase();
+    const normalized = (name ?? "").replace(/^ROLE_/, "").toLowerCase();
     if (normalized === "student") return "Student";
     if (normalized === "teacher") return "Teacher";
     if (normalized === "admin") return "Admin";

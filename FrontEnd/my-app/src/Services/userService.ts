@@ -22,7 +22,10 @@ import axios from "axios";
  * Frontend → API Gateway (/api/gateway/dashboard/*) → Backend Services → API Gateway → Frontend
  */
 
-function normalizeRole(role: string): string {
+function normalizeRole(role?: string): string {
+    if (!role) {
+        return "";
+    }
     return role.replace(/^ROLE_/, "").toLowerCase();
 }
 

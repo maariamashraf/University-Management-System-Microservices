@@ -21,7 +21,7 @@ export interface CourseRequest{
     startDate:Date;
     endDate:Date;
     departmentName:string;
-    teacherUserName:string;
+    userId:number;
     creditHours:number;
     maxStudents:number;
 }

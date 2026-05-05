@@ -8,7 +8,7 @@ import { CourseFormModal } from "../../components/Courses/CourseFormModal";
 import ErrorPage from "../../components/common/ErrorPage";
 import LoadingSpinner from "../../components/common/LodingSpinner";
 import { isCompleted } from "../../utils/courseUtils";
-import { getUserName } from "../../Services/authService";
+import { getUserId } from "../../Services/authService";
 import type { course, CourseRequest } from "../../Interfaces/course";
 import { getSemesterLabel } from "../../utils/dateUtils";
 export function TeacherCoursesDashboard() {
@@ -21,7 +21,7 @@ export function TeacherCoursesDashboard() {
     const [editCourse, setEditCourse]   = useState<course | null>(null);
     const [submitError, setSubmitError] = useState<string | null>(null);
 
-    const teacherUserName = getUserName();
+    const userId = getUserId();
 
     if (isLoading) return <LoadingSpinner />;
     if (error)     return <ErrorPage />;
@@ -69,7 +69,7 @@ export function TeacherCoursesDashboard() {
                 }
             );
         } else {
-            console.log({ ...data, teacherUserName });
+            console.log({ ...data, userId });
             createCourse(data, {
                 onSuccess: () => {
                     setSubmitError(null);
@@ -185,7 +185,7 @@ export function TeacherCoursesDashboard() {
                 onSubmit={handleSubmit}
                 isPending={isCreating || isUpdating}
                 editCourse={editCourse}
-                teacherUserName={teacherUserName}
+                userId={userId}
                 submitError={submitError}
             />
         </>

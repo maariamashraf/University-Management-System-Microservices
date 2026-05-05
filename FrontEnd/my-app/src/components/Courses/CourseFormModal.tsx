@@ -10,17 +10,17 @@ interface Props {
     onSubmit: (data: CourseRequest) => void;
     isPending: boolean;
     editCourse?: course | null;
-    teacherUserName: string;
+    userId: number;
     submitError?: string | null;
 }
 
-const EMPTY: Omit<CourseRequest, "teacherUserName"> = {
+const EMPTY: Omit<CourseRequest, "userId"> = {
     name: "", description: "", courseCode: "",
     startDate: new Date(), endDate: new Date(),
     departmentName: "", creditHours: 3, maxStudents: 30,
 };
 
-export function CourseFormModal({ isOpen, onClose, onSubmit, isPending, editCourse, teacherUserName, submitError }: Props) {
+export function CourseFormModal({ isOpen, onClose, onSubmit, isPending, editCourse, userId, submitError }: Props) {
     const [form, setForm] = useState(EMPTY);
    console.log("course Credits:", form.creditHours);
     useEffect(() => {
@@ -54,8 +54,8 @@ export function CourseFormModal({ isOpen, onClose, onSubmit, isPending, editCour
 
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
-        console.log({ ...form, teacherUserName });
-        onSubmit({ ...form, teacherUserName });
+        console.log({ ...form, userId });
+        onSubmit({ ...form, userId });
     }
 
     const inputCls = "w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-transparent transition";

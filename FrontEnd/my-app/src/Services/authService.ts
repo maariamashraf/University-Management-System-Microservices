@@ -16,13 +16,19 @@ export function isAuth() {
 }
 export function getUserId(): number {
   const token = getToken();
-  if (!token) throw new Error("No token found");
+  if (!token){
+    console.error("No token found when trying to get user ID");
+    throw new Error("No token found");
+  }
   return jwtDecode<MyTokenPayload>(token).userId;
 }
 
 export function getUserName(): string {
   const token = getToken();
-  if (!token) throw new Error("No token found");
+  if (!token){
+    console.error("No token found when trying to get user name");
+    throw new Error("No token found");
+  }
   const decoded = jwtDecode<MyTokenPayload>(token);
   return decoded.userName ?? decoded.sub;
 }
@@ -38,7 +44,10 @@ export function getTokenRoles(token: string): string[] {
   }
 }
 
-function normalizeRole(role: string): string {
+function normalizeRole(role?: string): string {
+  if (!role) {
+    return "";
+  }
   return role.replace(/^ROLE_/, "").toLowerCase();
 }
 export function setToken(token: string) {

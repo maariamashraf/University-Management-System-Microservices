@@ -7,7 +7,7 @@ import { queryClient } from "../../main";
 export function useCreateCourse() {
     const userId = getUserId();
     const { mutate, isPending, error } = useMutation({
-        mutationFn: (course: CourseRequest) => createCourse(course),
+        mutationFn: (course: CourseRequest) => createCourse({ ...course, userId }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["teacherCourses", userId] });
         },

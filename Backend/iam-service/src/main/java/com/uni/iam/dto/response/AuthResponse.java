@@ -1,6 +1,5 @@
 package com.uni.iam.dto.response;
 
-import com.uni.iam.entity.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
