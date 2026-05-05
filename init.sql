@@ -172,8 +172,13 @@ INSERT INTO students (user_id, gpa, enrollment_date, total_credits) VALUES
 -- 3. Insert Departments (Parent Table for 'courses')
 -- =========================================================
 INSERT INTO departments (name) VALUES
-('Computer Science'),
-('Information Technology');
+('Information_Systems'),
+('Information_Technology'),
+('Computer_Science'),
+('Software_Engineering'),
+('Data_Science'),
+('Artificial_Intelligence'),
+('Cybersecurity');
 
 -- =========================================================
 -- 4. Insert Courses (Child of 'departments' and 'teachers')
