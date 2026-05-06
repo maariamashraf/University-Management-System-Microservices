@@ -20,19 +20,16 @@ public class TeacherController {
     private final TeacherService teacherService;
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<TeacherResponse>> getAllTeachers() {
         return ResponseEntity.ok(teacherService.getAllTeachers());
     }
 
     @GetMapping("/basic/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER', 'STUDENT')")
     public ResponseEntity<TeacherBasicResponse> getTeacherBasic(@PathVariable Long id) {
         return ResponseEntity.ok(teacherService.getTeacherBasic(id));
     }
 
     @GetMapping("/details/{id}")
-    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
     public ResponseEntity<TeacherProfileResponse> getTeacherDetails(@PathVariable Long id) {
         return ResponseEntity.ok(teacherService.getTeacherDetails(id));
     }

@@ -7,6 +7,9 @@ import com.unisystem.academic_core_service.domain.exceptions.CourseNotFoundExcep
 import com.unisystem.academic_core_service.domain.model.Course;
 import com.unisystem.academic_core_service.infrastructure.aop.annotations.AuditLog;
 import com.unisystem.academic_core_service.infrastructure.adapters.in.http.Dto.Request.CreateCourseRequest;
+import com.unisystem.academic_core_service.infrastructure.adapters.in.http.Dto.Response.CourseCardResponse;
+import com.unisystem.academic_core_service.infrastructure.adapters.in.http.Dto.Response.CoureseDetailsResponse;
+import com.unisystem.academic_core_service.infrastructure.adapters.out.iam.IamClient;
 import com.unisystem.academic_core_service.infrastructure.adapters.out.persistence.entity.DepartmentEntity;
 import com.unisystem.academic_core_service.infrastructure.adapters.out.persistence.repository.DepartmentJpaRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +27,7 @@ public class CourseController {
     private final GetCoursesQuery getCoursesQuery;
     private final CourseRepositoryPort courseRepositoryPort;
     private final DepartmentJpaRepository departmentJpaRepository;
+    private final IamClient iamClient;
 
     @AuditLog(action = "CREATE_COURSE")
     @PostMapping
@@ -57,16 +61,64 @@ public class CourseController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Course> getCourseById(@PathVariable Long id) {
+    public ResponseEntity<CoureseDetailsResponse> getCourseById(
+            @PathVariable Long id,
+            @RequestHeader(value = "Authorization", required = false) String authHeader) {
         Course course = getCoursesQuery.findById(id)
                 .orElseThrow(() -> new CourseNotFoundException(id));
-        return ResponseEntity.ok(course);
+        IamClient.TeacherBasicResponse teacherBasic = course.getTeacherId() == null
+                ? null
+                : iamClient.getTeacherBasic(course.getTeacherId(), authHeader);
+
+        String teacherUserName = teacherBasic == null ? null : teacherBasic.getTeacherName();
+
+        CoureseDetailsResponse response = CoureseDetailsResponse.builder()
+                .id(course.getId())
+                .name(course.getName())
+                .description(course.getDescription())
+                .courseCode(course.getCourseCode())
+                .startDate(course.getStartDate())
+                .endDate(course.getEndDate())
+                .credits(course.getCredits())
+                .maxStudents(course.getMaxStudents())
+                .enrolledCount(course.getEnrolledCount())
+                .teacherId(course.getTeacherId() == null ? 0 : Math.toIntExact(course.getTeacherId()))
+                .teacherName(teacherUserName)
+                .build();
+
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<Course>> getAllCourses() {
+    public ResponseEntity<List<CourseCardResponse>> getAllCourses(
+            @RequestHeader(value = "Authorization", required = false) String authHeader) {
         List<Course> courses = getCoursesQuery.findAll();
-        return ResponseEntity.ok(courses);
+        List<CourseCardResponse> response = courses.stream()
+                .map(course -> {
+                    IamClient.TeacherBasicResponse teacherBasic = course.getTeacherId() == null
+                            ? null
+                            : iamClient.getTeacherBasic(course.getTeacherId(), authHeader);
+
+                    String teacherName = teacherBasic == null ? null : teacherBasic.getTeacherName();
+
+                    return CourseCardResponse.builder()
+                            .id(course.getId())
+                            .name(course.getName())
+                            .description(course.getDescription())
+                            .courseCode(course.getCourseCode())
+                            .startDate(course.getStartDate())
+                            .endDate(course.getEndDate())
+                            .teacherName(teacherName)
+                            .teacherUserName(teacherName)
+                            .credits(course.getCredits())
+                            .creditHours(course.getCredits())
+                            .maxStudents(course.getMaxStudents())
+                            .enrolledCount(course.getEnrolledCount())
+                            .enrolledStudents(course.getEnrolledCount())
+                            .build();
+                })
+                .toList();
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/by-ids")

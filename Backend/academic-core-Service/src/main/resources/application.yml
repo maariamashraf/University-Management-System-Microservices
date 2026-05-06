@@ -32,7 +32,7 @@ server:
   port: 8082
 
 app:
-  iam-base-url: ${IAM_BASE_URL:http://localhost:8081}
+  iam-base-url: ${IAM_BASE_URL:http://localhost:8080}
 
 eureka:
   client:

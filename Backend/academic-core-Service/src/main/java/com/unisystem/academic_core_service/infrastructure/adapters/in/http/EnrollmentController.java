@@ -53,7 +53,7 @@ public class EnrollmentController {
             @RequestHeader(value = "Authorization", required = false) String authorization) {
         List<Enrollment> enrollments = enrollmentRepositoryPort.findByStudentId(studentId);
         IamClient.StudentBasicResponse studentBasic = iamClient.getStudentBasic(studentId, authorization);
-        String studentName = studentBasic != null ? studentBasic.getUsername() : "Unknown";
+        String studentName = studentBasic != null ? studentBasic.resolveUsername() : "Unknown";
 
         List<Long> courseIds = enrollments.stream()
                 .map(Enrollment::getCourseId)
@@ -127,6 +127,7 @@ public class EnrollmentController {
         IamClient.TeacherBasicResponse teacher = course.getTeacherId() != null
                 ? iamClient.getTeacherBasic(course.getTeacherId(), authorization)
                 : null;
+
         String teacherName = teacher != null ? teacher.getTeacherName() : "Unknown";
 
         Map<Long, String> studentNameById = enrollments.stream()
@@ -136,7 +137,7 @@ public class EnrollmentController {
                         Function.identity(),
                         studentId -> {
                             IamClient.StudentBasicResponse student = iamClient.getStudentBasic(studentId, authorization);
-                            return student != null ? student.getUsername() : "Unknown";
+                            return student != null ? student.resolveUsername() : "Unknown";
                         }));
 
         List<EnrolledCourseResponse> responses = enrollments.stream()
