@@ -18,7 +18,6 @@ export default function TeachingCourses({ courses, semester = "Spring 2026" }: T
                             <th className="pb-3 text-md font-semibold text-gray-500 uppercase tracking-wider">DEPARTMENT</th>
                             <th className="pb-3 text-md font-semibold text-gray-500 uppercase tracking-wider text-center">CREDITS</th>
                             <th className="pb-3 text-md font-semibold text-gray-500 uppercase tracking-wider text-center">ENROLLMENT</th>
-                            <th className="pb-3 text-md font-semibold text-gray-500 uppercase tracking-wider">ACTION</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -38,11 +37,6 @@ export default function TeachingCourses({ courses, semester = "Spring 2026" }: T
                                         <span className={`px-3 py-1 rounded-full text-xs font-medium ${getCapacityColor(course.enrolledStudents, course.maxStudents)}`}>
                                             {course.enrolledStudents} / {course.maxStudents}
                                         </span>
-                                    </td>
-                                    <td className="py-4">
-                                        <button className="text-blue-500 text-sm font-medium hover:underline">
-                                            Manage Course
-                                        </button>
                                     </td>
                                 </tr>
                             ))

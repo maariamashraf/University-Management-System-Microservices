@@ -31,9 +31,7 @@ export default function EnrolledCourses({ courses, semester = "Spring 2026" }: E
                             <th className="py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">
                                 Status
                             </th>
-                            <th className="py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">
-                                Action
-                            </th>
+                        
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
@@ -68,11 +66,7 @@ export default function EnrolledCourses({ courses, semester = "Spring 2026" }: E
                                             {course.status}
                                         </span>
                                     </td>
-                                    <td className="py-3.5 px-4 text-center">
-                                        <button className="text-xs font-semibold text-blue-600 hover:text-blue-800 hover:underline transition-colors">
-                                            View Materials
-                                        </button>
-                                    </td>
+                                    
                                 </tr>
                             ))
                         )}

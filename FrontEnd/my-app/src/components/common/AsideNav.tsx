@@ -19,8 +19,6 @@ const navItems = [
     { label: "Dashboard", icon: LayoutDashboard, to: "/dashboard" },
     { label: "My Courses", icon: BookOpen, to: "/dashboard/Courses" },
     { label: "Registration", icon: ClipboardList, to: "/dashboard/registration" },
-    { label: "Grades & Transcript", icon: FileText, to: "/dashboard/grades" },
-    { label: "Schedule", icon: Calendar, to: "/dashboard/schedule" },
     { label: "Settings", icon: Settings, to: "/dashboard/settings" },
 ];
 const AdminNavItems = [
