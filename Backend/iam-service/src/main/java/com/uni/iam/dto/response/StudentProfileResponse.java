@@ -1,5 +1,4 @@
 package com.uni.iam.dto.response;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

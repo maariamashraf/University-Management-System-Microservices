@@ -70,8 +70,13 @@ public class EnrollmentController {
                 .map(com.unisystem.academic_core_service.domain.model.Course::getTeacherId)
                 .filter(teacherId -> teacherId != null)
                 .distinct()
-                .map(teacherId -> Map.entry(teacherId, iamClient.getTeacherBasic(teacherId, authorization)))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                .collect(Collectors.toMap(
+                        Function.identity(),
+                        teacherId -> {
+                            IamClient.TeacherBasicResponse t = iamClient.getTeacherBasic(teacherId, authorization);
+                            return t != null ? t : new IamClient.TeacherBasicResponse(teacherId, "Unknown", null);
+                        }
+                ));
 
         List<EnrolledCourseResponse> responses = enrollments.stream()
                 .map(enrollment -> {
