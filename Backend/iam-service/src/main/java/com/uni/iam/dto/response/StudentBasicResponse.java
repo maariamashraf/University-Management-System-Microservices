@@ -9,8 +9,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TeacherBasicResponse {
-    private Long id;
-    private String teacherName;
-    private String officeLocation;
+public class StudentBasicResponse {
+    String username;
 }

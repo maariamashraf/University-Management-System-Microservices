@@ -10,4 +10,5 @@ public interface StudentService {
     List<StudentResponse> getAllStudents();
 
     StudentProfileResponse getStudentDetails(Long id);
+   String getStudentName(Long id);
 }

@@ -1,7 +1,9 @@
 package com.uni.iam.controller;
 
+import com.uni.iam.dto.response.StudentBasicResponse;
 import com.uni.iam.dto.response.StudentResponse;
 import com.uni.iam.dto.response.StudentProfileResponse;
+import com.uni.iam.dto.response.TeacherBasicResponse;
 import com.uni.iam.service.interfaces.StudentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,14 +23,18 @@ public class StudentController {
     private final StudentService studentService;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
     public ResponseEntity<List<StudentResponse>> getAllStudents() {
         return ResponseEntity.ok(studentService.getAllStudents());
     }
 
     @GetMapping("/details/{id}")
-    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
     public ResponseEntity<StudentProfileResponse> getStudentDetails(@PathVariable Long id) {
         return ResponseEntity.ok(studentService.getStudentDetails(id));
+    }
+    @GetMapping("/basic/{id}")
+    public ResponseEntity<StudentBasicResponse> getStudentBasic(@PathVariable Long id) {
+        String name=studentService.getStudentName(id);
+        StudentBasicResponse response=new StudentBasicResponse(name);
+        return ResponseEntity.ok(response);
     }
 }

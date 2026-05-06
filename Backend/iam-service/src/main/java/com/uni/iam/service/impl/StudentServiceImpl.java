@@ -107,6 +107,15 @@ public class StudentServiceImpl implements StudentService {
                 .build();
     }
 
+    @Override
+    public String getStudentName(Long id) {
+      Student student = studentRepository.findById(id)
+              .orElse(null);
+      if(student == null)
+          throw new UserNotFoundException(id);
+      return student.getUsername();
+    }
+
     private String determineAcademicStanding(BigDecimal gpa) {
         if (gpa == null) {
             return "Good Standing";
@@ -132,4 +141,5 @@ public class StudentServiceImpl implements StudentService {
                 .totalCredits(student.getTotalCredits())
                 .build();
     }
+
 }

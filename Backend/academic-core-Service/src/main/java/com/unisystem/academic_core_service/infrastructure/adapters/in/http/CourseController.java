@@ -154,6 +154,12 @@ public class CourseController {
         return ResponseEntity.ok(courses);
     }
 
+    @GetMapping("/testIam/{id}")
+    public String testIam(@PathVariable Long id, @RequestHeader(value = "Authorization", required = false) String authHeader){
+        String res=iamClient.getStudentBasicRaw(id, authHeader);
+        return res;
+    }
+
 
 
     private Long resolveDepartmentId(String departmentName) {
@@ -189,6 +195,9 @@ public class CourseController {
         }
     }
 
+
     public record CourseIdsRequest(List<Long> ids) {
     }
+
+
 }
