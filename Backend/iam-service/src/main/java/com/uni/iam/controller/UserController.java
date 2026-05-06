@@ -30,55 +30,31 @@ import java.util.List;
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
-
     private final UserService userService;
-
-    // ════════════════════════════════════════════════════════════
-    // GET  /api/users/me
-    // Returns the currently authenticated user's profile.
-    // ════════════════════════════════════════════════════════════
     @GetMapping("/me")
     public ResponseEntity<UserResponse> getCurrentUser(Authentication authentication) {
         String username = authentication.getName();
         return ResponseEntity.ok(userService.getUserByUsername(username));
     }
 
-    // ════════════════════════════════════════════════════════════
-    // GET  /api/users/{id}
-    // Returns any user by primary key.
-    // ADMIN sees all.
-    // ════════════════════════════════════════════════════════════
+
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getUserById(id));
     }
 
-    // ════════════════════════════════════════════════════════════
-    // GET  /api/users
-    // Returns all users (any type/role). Admin-only.
-    // ════════════════════════════════════════════════════════════
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UserResponse>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
-    // ════════════════════════════════════════════════════════════
-    // GET  /api/users/role/{role}
-    // Returns all users with the given role.
-    // ════════════════════════════════════════════════════════════
+
     @GetMapping("/role/{role}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UserResponse>> getUsersByRole(@PathVariable Role role) {
         return ResponseEntity.ok(userService.getUsersByRole(role));
     }
 
-    // ════════════════════════════════════════════════════════════
-    // PUT  /api/users/{id}
-    // Partial update — only non-null fields are changed.
-    // ADMIN can update anyone; users can update themselves.
-    // ════════════════════════════════════════════════════════════
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
     public ResponseEntity<UserResponse> updateUser(
@@ -87,16 +63,24 @@ public class UserController {
         return ResponseEntity.ok(userService.updateUser(id, request));
     }
 
-    // ════════════════════════════════════════════════════════════
-    // DELETE  /api/users/{id}
-    // Permanently deletes a user. Admin-only.
-    // ════════════════════════════════════════════════════════════
+    @PostMapping("{id}/activate")
+    public ResponseEntity<Void> activateUser(@PathVariable Long id) {
+        userService.activeUser(id);
+        return ResponseEntity.ok().build();
+    }
+    @PostMapping("/{id}/deactivate")
+    public ResponseEntity<Void> deactivateUser(@PathVariable Long id) {
+        userService.deactiveUser(id);
+        return ResponseEntity.ok().build();
+    }
+
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
+
 
 
 }

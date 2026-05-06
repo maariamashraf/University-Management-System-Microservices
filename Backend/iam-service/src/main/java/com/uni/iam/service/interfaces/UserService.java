@@ -42,4 +42,7 @@ public interface UserService {
 
     /** Permanently delete a user and their sub-type record. */
     void deleteUser(Long id);
+    void activeUser(Long id);
+    void deactiveUser(Long id);
 }
+

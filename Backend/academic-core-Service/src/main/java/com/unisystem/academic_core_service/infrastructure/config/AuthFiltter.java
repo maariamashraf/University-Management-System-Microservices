@@ -1,4 +1,5 @@
 package com.unisystem.academic_core_service.infrastructure.config;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -7,7 +8,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
+
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 public class AuthFiltter extends OncePerRequestFilter {
@@ -17,12 +20,11 @@ public class AuthFiltter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain) throws ServletException, IOException {
 
-        String userId = request.getHeader("X-User-Id");
-        String role = request.getHeader("X-Roles");
+        String userId = emptyToNull(request.getHeader("X-User-Id"));
+        String xRoles = emptyToNull(request.getHeader("X-Roles"));
 
-        if (userId != null && role != null) {
-
-            List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(role));
+        if (userId != null && xRoles != null) {
+            List<SimpleGrantedAuthority> authorities = parseAuthorities(xRoles);
 
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userId, null,
                     authorities);
@@ -31,5 +33,27 @@ public class AuthFiltter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private static String emptyToNull(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        return value.trim();
+    }
+
+    private static List<SimpleGrantedAuthority> parseAuthorities(String xRoles) {
+        String trimmed = xRoles.trim();
+        if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
+            trimmed = trimmed.substring(1, trimmed.length() - 1);
+        }
+        if (trimmed.isEmpty()) {
+            return List.of();
+        }
+        return Arrays.stream(trimmed.split(","))
+                .map(String::trim)
+                .filter(part -> !part.isEmpty())
+                .map(SimpleGrantedAuthority::new)
+                .toList();
     }
 }

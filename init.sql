@@ -1,9 +1,4 @@
 
-
-
-
-
-
 -- ==========================================
 -- 1. IAM SERVICE TABLES
 -- ==========================================
@@ -108,12 +103,16 @@ CREATE TABLE IF NOT EXISTS feedback (
 CREATE TABLE IF NOT EXISTS audit_logs (
     id         BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id    BIGINT NULL,
+    user_name  VARCHAR(255) NULL,
+    user_role  VARCHAR(20) NULL,
     action     VARCHAR(255) NOT NULL,
     details    TEXT,
     ip_address VARCHAR(50),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     INDEX idx_audit_user_id (user_id),
-    INDEX idx_audit_action (action)
+    INDEX idx_audit_action (action),
+    INDEX idx_audit_created_at (created_at),
+    INDEX idx_audit_user_role (user_role)
 );
 
 -- ==========================================

@@ -42,7 +42,7 @@ export default function UserTable({ users, onSelectUser }: UserTableProps) {
             </div>
         );
     }
-
+    console.log("users", users);
     return (
         <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
             <table className="min-w-full divide-y divide-slate-200">
@@ -65,9 +65,7 @@ export default function UserTable({ users, onSelectUser }: UserTableProps) {
                         change Acount status
                     </th>
                         
-                        <th className="mr-6 px-15 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">
-                            Action
-                        </th>
+              
 
 
                     </tr>
@@ -102,15 +100,7 @@ export default function UserTable({ users, onSelectUser }: UserTableProps) {
                                     )
                                 }
                             </td>
-                            <td className="px-4 py-3 text-right">
-                                <button
-                                    type="button"
-                                    onClick={() => onSelectUser(user)}
-                                    className="rounded-lg border border-blue-600 px-3 py-1.5 text-sm font-medium text-blue-600 transition hover:bg-blue-600 hover:text-white"
-                                >
-                                    Manage Permissions
-                                </button>
-                            </td>
+                            
                         </tr>
                     ))}
                 </tbody>

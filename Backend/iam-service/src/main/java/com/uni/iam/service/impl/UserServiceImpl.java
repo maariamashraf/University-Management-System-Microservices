@@ -70,6 +70,20 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(id);
     }
 
+    @Override
+    public void activeUser(Long id) {
+        User user = findUserOrThrow(id);
+        user.setActive(true);
+        userRepository.save(user);
+    }
+
+    @Override
+    public void deactiveUser(Long id) {
+    User user = findUserOrThrow(id);
+    user.setActive(false);
+    userRepository.save(user);
+    }
+
     private User findUserOrThrow(Long id) {
         return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
     }
