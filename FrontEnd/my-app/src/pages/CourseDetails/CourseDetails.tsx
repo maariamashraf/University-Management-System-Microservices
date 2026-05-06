@@ -49,7 +49,7 @@ export default function CourseDetails() {
                     activeTab={activeTab}
                     onTabChange={setActiveTab}
                     course={course}
-                    enrolledCount={course.enrolledStudents}
+                    enrolledCount={course.enrolledStudents ?? course.enrolledCount ?? 0}
                 />
 
                 <main className="flex-1 overflow-y-auto p-6">

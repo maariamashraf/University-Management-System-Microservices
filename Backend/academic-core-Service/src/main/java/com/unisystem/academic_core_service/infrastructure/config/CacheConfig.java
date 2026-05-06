@@ -1,4 +1,6 @@
 package com.unisystem.academic_core_service.infrastructure.config;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Bean;
@@ -9,6 +11,7 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 
 import java.time.Duration;
 import java.util.Set;
@@ -35,12 +38,22 @@ public class CacheConfig {
 
     @Bean
     @Primary
-    public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory, ObjectMapper objectMapper) {
+    public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
+        ObjectMapper cacheObjectMapper = new ObjectMapper();
+        cacheObjectMapper.findAndRegisterModules();
+        cacheObjectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        cacheObjectMapper.activateDefaultTyping(
+                LaissezFaireSubTypeValidator.instance,
+                ObjectMapper.DefaultTyping.NON_FINAL,
+                JsonTypeInfo.As.PROPERTY
+        );
+
         RedisCacheConfiguration defaultConfig = RedisCacheConfiguration.defaultCacheConfig()
                 .entryTtl(Duration.ofMinutes(10))
+                .disableCachingNullValues()
                 .serializeValuesWith(
                         RedisSerializationContext.SerializationPair.fromSerializer(
-                                new GenericJackson2JsonRedisSerializer(objectMapper)
+                                new GenericJackson2JsonRedisSerializer(cacheObjectMapper)
                         )
                 );
 

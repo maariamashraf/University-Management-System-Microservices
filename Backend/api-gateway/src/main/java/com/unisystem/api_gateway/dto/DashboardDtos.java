@@ -113,9 +113,7 @@ public final class DashboardDtos {
     }
 
     public record StudentDashboardResponseDto(
-            StudentProfileDto profile,
-            List<EnrollmentDto> enrollments,
-            List<CourseDto> courses) {
+            StudentProfileDto profile) {
     }
 
     public record TeacherDashboardResponseDto(

@@ -2,6 +2,7 @@ package com.uni.iam.service.impl;
 
 import com.uni.iam.client.AcademicCoreClient;
 import com.uni.iam.dto.response.AnnouncementSummaryResponse;
+import com.uni.iam.dto.response.TeacherBasicResponse;
 import com.uni.iam.dto.response.TeacherCourseResponse;
 import com.uni.iam.dto.response.TeacherProfileResponse;
 import com.uni.iam.dto.response.TeacherResponse;
@@ -30,6 +31,19 @@ public class TeacherServiceImpl implements TeacherService {
     public List<TeacherResponse> getAllTeachers() {
         return teacherRepository.findAll().stream().map(this::toTeacherResponse).toList();
     }
+
+        @Override
+        @Transactional(readOnly = true)
+        public TeacherBasicResponse getTeacherBasic(Long id) {
+                Teacher teacher = teacherRepository.findById(id)
+                                .orElseThrow(() -> new UserNotFoundException(id));
+
+                return TeacherBasicResponse.builder()
+                                .id(teacher.getId())
+                                .teacherName(teacher.getUsername())
+                                .officeLocation(teacher.getOfficeLocation())
+                                .build();
+        }
 
     @Override
     @Transactional(readOnly = true)

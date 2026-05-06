@@ -27,7 +27,7 @@ export async function getStudentInfo(_id: number): Promise<Student> {
         const response = await axios.get<StudentBffResponse>(`${ApiUrl}/api/gateway/dashboard/student/${_id}`, {
             headers: getAuthHeaders(),
         });
-        console.log("Student info fetched via BFF endpoint");
+        console.log("Student info fetched via BFF endpoint", response.data);
         return response.data.profile;
     } catch (error) {
         if (axios.isAxiosError(error)) {

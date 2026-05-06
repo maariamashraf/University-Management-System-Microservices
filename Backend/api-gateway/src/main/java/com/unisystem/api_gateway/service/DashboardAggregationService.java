@@ -17,7 +17,6 @@ import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
 import java.nio.charset.StandardCharsets;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 
@@ -38,43 +37,36 @@ public class DashboardAggregationService {
                 DashboardDtos.StudentProfileDto.class,
                 studentId);
 
-        Mono<List<DashboardDtos.EnrollmentDto>> enrollmentsMono = callGetList(
-                "http://academic-core:8082/api/enrolled-courses/student/{id}",
-                token,
-                DashboardDtos.EnrollmentDto.class,
-                studentId).onErrorResume(error -> {
-                    log.warn("BFF: Failed to fetch enrollments for student {}: {}", studentId, error.getMessage());
-                    return Mono.just(List.of());
-                });
+        Mono<List<DashboardDtos.EnrolledCourseSummaryDto>> enrolledCoursesMono = callGetList(
+            "http://academic-core:8082/api/enrolled-courses/student/{id}",
+            token,
+            DashboardDtos.EnrolledCourseSummaryDto.class,
+            studentId).onErrorResume(error -> {
+                log.warn("BFF: Failed to fetch enrolled courses for student {}: {}", studentId, error.getMessage());
+                return Mono.just(List.of());
+            });
 
-        return Mono.zip(profileMono, enrollmentsMono)
-                .flatMap(tuple -> {
-                    DashboardDtos.StudentProfileDto profile = tuple.getT1();
-                    List<DashboardDtos.EnrollmentDto> enrollments = tuple.getT2();
+        return Mono.zip(profileMono, enrolledCoursesMono)
+            .map(tuple -> {
+                DashboardDtos.StudentProfileDto profile = tuple.getT1();
+                List<DashboardDtos.EnrolledCourseSummaryDto> enrolledCourses = tuple.getT2();
 
-                    List<Long> courseIds = enrollments.stream()
-                            .map(DashboardDtos.EnrollmentDto::courseId)
-                            .filter(id -> id != null)
-                            .collect(java.util.stream.Collectors.collectingAndThen(
-                                    java.util.stream.Collectors.toCollection(LinkedHashSet::new),
-                                    List::copyOf));
+                DashboardDtos.StudentProfileDto mergedProfile = new DashboardDtos.StudentProfileDto(
+                    profile.id(),
+                    profile.role(),
+                    profile.username(),
+                    profile.email(),
+                    profile.gpa(),
+                    profile.totalCredits(),
+                    enrolledCourses,
+                    enrolledCourses.size(),
+                    profile.enrollmentYear(),
+                    profile.academicStanding(),
+                    profile.announcements(),
+                    profile.upcomingEvents());
 
-                    Mono<List<DashboardDtos.CourseDto>> coursesMono = courseIds.isEmpty()
-                            ? Mono.just(List.of())
-                            : callPost(
-                                    "http://academic-core:8082/api/courses/by-ids",
-                                    token,
-                                    new DashboardDtos.CourseIdsRequestDto(courseIds),
-                                    new ParameterizedTypeReference<List<DashboardDtos.CourseDto>>() {
-                                    }).onErrorResume(error -> {
-                                        log.warn("BFF: Failed to fetch bulk courses for student {}: {}", studentId,
-                                                error.getMessage());
-                                        return Mono.just(List.of());
-                                    });
-
-                    return coursesMono.map(
-                            courses -> new DashboardDtos.StudentDashboardResponseDto(profile, enrollments, courses));
-                });
+                return new DashboardDtos.StudentDashboardResponseDto(mergedProfile);
+            });
     }
 
     public Mono<DashboardDtos.TeacherDashboardResponseDto> getTeacherDashboard(Long teacherId, String token) {

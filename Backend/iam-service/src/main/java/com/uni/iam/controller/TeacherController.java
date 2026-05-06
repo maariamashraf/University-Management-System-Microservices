@@ -1,4 +1,5 @@
 package com.uni.iam.controller;
+import com.uni.iam.dto.response.TeacherBasicResponse;
 import com.uni.iam.dto.response.TeacherResponse;
 import com.uni.iam.dto.response.TeacherProfileResponse;
 import com.uni.iam.service.interfaces.TeacherService;
@@ -22,6 +23,12 @@ public class TeacherController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<TeacherResponse>> getAllTeachers() {
         return ResponseEntity.ok(teacherService.getAllTeachers());
+    }
+
+    @GetMapping("/basic/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER', 'STUDENT')")
+    public ResponseEntity<TeacherBasicResponse> getTeacherBasic(@PathVariable Long id) {
+        return ResponseEntity.ok(teacherService.getTeacherBasic(id));
     }
 
     @GetMapping("/details/{id}")

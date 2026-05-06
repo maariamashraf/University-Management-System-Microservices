@@ -85,7 +85,17 @@ export async function getCourseById(courseId: number) {
         const response = await axios.get(`${ApiUrl}/api/courses/${courseId}`, {
             headers: getAuthHeaders(),
         });
-        return response.data;
+        const c = response.data;
+        return {
+            ...c,
+            // Keep course-details UI compatible with both old/new backend field names.
+            department: c.department ?? c.departmentName,
+            teacherName: c.teacherName ?? c.teacherUserName,
+            credits: c.credits ?? c.creditHours,
+            enrolledStudents: c.enrolledStudents ?? c.enrolledCount,
+            teacherUserName: c.teacherUserName ?? c.teacherName,
+            creditHours: c.creditHours ?? c.credits,
+        };
     }catch(error){
         if(axios.isAxiosError(error)){
             if(error.response){

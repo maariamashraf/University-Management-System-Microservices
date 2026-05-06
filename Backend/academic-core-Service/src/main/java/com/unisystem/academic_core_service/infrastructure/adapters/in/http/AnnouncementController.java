@@ -40,11 +40,46 @@ public class AnnouncementController {
         );
 
         return ResponseEntity.ok(toResponse(savedAnnouncement));
+}
+
+
+
+
+@GetMapping("/course/{courseId}")
+public ResponseEntity<List<AnnouncementResponse>> getAnnouncementsByCourseId(@PathVariable Long courseId) {
+        List<AnnouncementResponse> responses = getAnnouncementsQuery.getAnnouncementsByCourseId(courseId)
+                .stream()
+                .map(announcement -> new AnnouncementResponse(
+                        announcement.id(),
+                        announcement.title(),
+                        announcement.content(),
+                        announcement.courseId(),
+                        announcement.createdAt()
+                ))
+                .toList();
+
+        return ResponseEntity.ok(responses);
     }
 
-    @GetMapping("/course/{courseId}")
-    public ResponseEntity<List<AnnouncementResponse>> getAnnouncementsByCourseId(@PathVariable Long courseId) {
-        List<AnnouncementResponse> responses = getAnnouncementsQuery.getAnnouncementsByCourseId(courseId)
+    @GetMapping("/student/{studentId}")
+    public ResponseEntity<List<AnnouncementResponse>> getAnnouncementsByStudentId(@PathVariable Long studentId) {
+        List<AnnouncementResponse> responses = getAnnouncementsQuery.getAnnouncementsByStudentId(studentId)
+                .stream()
+                .map(announcement -> new AnnouncementResponse(
+                        announcement.id(),
+                        announcement.title(),
+                        announcement.content(),
+                        announcement.courseId(),
+                        announcement.createdAt()
+                ))
+                .toList();
+
+        return ResponseEntity.ok(responses);
+    }
+
+    @GetMapping("/teacher/{teacherId}")
+    public ResponseEntity<List<AnnouncementResponse>> getAnnouncementsByTeacherId(@PathVariable Long teacherId) {
+        List<AnnouncementResponse> responses = getAnnouncementsQuery.getAnnouncementsByTeacherId(teacherId)
                 .stream()
                 .map(announcement -> new AnnouncementResponse(
                         announcement.id(),

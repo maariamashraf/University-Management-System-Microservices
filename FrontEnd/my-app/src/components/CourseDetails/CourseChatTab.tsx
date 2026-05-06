@@ -134,7 +134,7 @@ export default function CourseChatTab({
                             key={msg.id}
                             message={msg}
                             isOwn={msg.senderId === currentUserId}
-                            teacherUserName={course?.teacherUserName ?? ""}
+                            teacherUserName={course?.teacherUserName ?? course?.teacherName ?? ""}
                         />
                     ))
                 )}

@@ -32,7 +32,9 @@ const NAV_ITEMS = [
 ] as const;
 
 export default function CourseSidebar({ activeTab, onTabChange, course }: CourseSidebarProps) {
-   console.log("course in the sidebar", course);
+    const teacherName = course.teacherUserName ?? course.teacherName ?? "N/A";
+    const credits = course.creditHours ?? course.credits ?? 0;
+
     return (
         <aside className="w-56 shrink-0 bg-white border-r border-gray-200 flex flex-col overflow-y-auto">
             <div className="p-4 flex-1">
@@ -63,7 +65,7 @@ export default function CourseSidebar({ activeTab, onTabChange, course }: Course
                     <div className="space-y-3 px-1">
                         <div className="flex items-center gap-2 text-xs text-gray-600">
                             <User size={13} className="text-gray-400 shrink-0" />
-                            <span className="text-sm font-medium truncate">{course.teacherUserName}</span>
+                            <span className="text-sm font-medium truncate">{teacherName}</span>
                         </div>
                         <div className="flex items-center gap-2 text-xs text-gray-600">
                             <BookOpen size={13} className="text-gray-400 shrink-0" />
@@ -71,7 +73,7 @@ export default function CourseSidebar({ activeTab, onTabChange, course }: Course
                         </div>
                         <div className="flex items-center gap-2 text-xs text-gray-600">
                             <Clock size={13} className="text-gray-400 shrink-0" />
-                            <span className="text-sm font-medium truncate">{course.creditHours}</span>
+                            <span className="text-sm font-medium truncate">{credits}</span>
                         </div>
                         <div className="flex items-center gap-2 text-xs text-gray-600">
                             <Clock size={13} className="text-gray-400 shrink-0" />

@@ -24,6 +24,7 @@ import com.unisystem.academic_core_service.domain.application.services.GetFeedba
 import com.unisystem.academic_core_service.domain.application.services.SubmitFeedbackService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestTemplate;
 
 @Configuration
 public class BeanConfig {
@@ -68,16 +69,27 @@ public class BeanConfig {
     }
 
     @Bean
-    public GetAnnouncementsQuery getAnnouncementsQuery(AnnouncementRepositoryPort announcementRepositoryPort) {
-        return new GetAnnouncementsService(announcementRepositoryPort);
+    public GetAnnouncementsQuery getAnnouncementsQuery(
+            AnnouncementRepositoryPort announcementRepositoryPort,
+            EnrollmentRepositoryPort enrollmentRepositoryPort,
+            CourseRepositoryPort courseRepositoryPort) {
+        return new GetAnnouncementsService(
+                announcementRepositoryPort,
+                enrollmentRepositoryPort,
+                courseRepositoryPort);
     }
 
-@Bean
-public ObjectMapper objectMapper() {
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.registerModule(new JavaTimeModule());
-    mapper.disable(com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-    return mapper;
-}
+    @Bean
+    public ObjectMapper objectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        mapper.disable(com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        return mapper;
+    }
+
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
 
 }

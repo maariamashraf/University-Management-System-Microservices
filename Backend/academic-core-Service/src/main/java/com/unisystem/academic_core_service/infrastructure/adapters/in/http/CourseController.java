@@ -2,6 +2,7 @@ package com.unisystem.academic_core_service.infrastructure.adapters.in.http;
 
 import com.unisystem.academic_core_service.domain.application.port.in.CreateCourseUseCase;
 import com.unisystem.academic_core_service.domain.application.port.in.GetCoursesQuery;
+import com.unisystem.academic_core_service.domain.application.port.out.CourseRepositoryPort;
 import com.unisystem.academic_core_service.domain.exceptions.CourseNotFoundException;
 import com.unisystem.academic_core_service.domain.model.Course;
 import com.unisystem.academic_core_service.infrastructure.aop.annotations.AuditLog;
@@ -21,6 +22,7 @@ public class CourseController {
 
     private final CreateCourseUseCase createCourseUseCase;
     private final GetCoursesQuery getCoursesQuery;
+    private final CourseRepositoryPort courseRepositoryPort;
     private final DepartmentJpaRepository departmentJpaRepository;
 
     @AuditLog(action = "CREATE_COURSE")
@@ -44,6 +46,14 @@ public class CourseController {
 
         Course course = createCourseUseCase.create(command);
         return ResponseEntity.ok(course);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteCourse(@PathVariable Long id) {
+        getCoursesQuery.findById(id)
+                .orElseThrow(() -> new CourseNotFoundException(id));
+        courseRepositoryPort.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}")
@@ -84,12 +94,15 @@ public class CourseController {
         List<Course> courses = getCoursesQuery.findByTeacherId(teacherId);
         return ResponseEntity.ok(courses);
     }
+    
 
     @GetMapping("/Department/{departmentName}")
     public ResponseEntity<List<Course>> getCoursesByDepartmentName(@PathVariable String departmentName) {
         List<Course> courses = getCoursesQuery.findByDepartmentName(departmentName);
         return ResponseEntity.ok(courses);
     }
+
+
 
     private Long resolveDepartmentId(String departmentName) {
         if (departmentName == null || departmentName.isBlank()) {

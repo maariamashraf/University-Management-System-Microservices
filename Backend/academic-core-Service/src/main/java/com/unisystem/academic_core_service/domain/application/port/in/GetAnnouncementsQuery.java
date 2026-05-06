@@ -5,6 +5,8 @@ import java.util.List;
 
 public interface GetAnnouncementsQuery {
     List<AnnouncementDTO> getAnnouncementsByCourseId(Long courseId);
+    List<AnnouncementDTO> getAnnouncementsByStudentId(Long studentId);
+    List<AnnouncementDTO> getAnnouncementsByTeacherId(Long teacherId);
 
     record AnnouncementDTO(
             Long id,

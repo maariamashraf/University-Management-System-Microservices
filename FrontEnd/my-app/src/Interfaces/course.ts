@@ -12,6 +12,9 @@ export interface course{
     credits:number;
     maxStudents:number;
     enrolledStudents:number;
+    enrolledCount?: number;
+    teacherUserName?: string;
+    creditHours?: number;
 }
 
 export interface CourseRequest{
@@ -29,9 +32,11 @@ export interface CourseRequest{
 export interface CourseSidebar {
 courseCode:string;
 creditHours:number;
+credits?: number;
 startDate:Date;
 endDate:Date;
 enrolledStudents:number;
 name:string;
 teacherUserName:string;
+teacherName?: string;
 }
