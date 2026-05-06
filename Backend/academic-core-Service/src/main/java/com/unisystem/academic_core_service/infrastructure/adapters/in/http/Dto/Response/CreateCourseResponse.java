@@ -1,6 +1,6 @@
 package com.unisystem.academic_core_service.infrastructure.adapters.in.http.Dto.Response;
 
-public record CreateCourseResponse(  Long id,
+public record CreateCourseResponse( Long id,
                                      String name,
                                      String courseCode,
                                      int maxStudents,

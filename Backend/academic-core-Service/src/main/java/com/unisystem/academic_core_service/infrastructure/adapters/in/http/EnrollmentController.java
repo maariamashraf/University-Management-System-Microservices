@@ -26,6 +26,14 @@ public class EnrollmentController {
         return ResponseEntity.ok(enrollment);
     }
 
+   
+   @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        enrollmentRepositoryPort.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
+
+
     @DeleteMapping("/drop")
     public ResponseEntity<Void> drop(
             @RequestParam Long studentId,
@@ -55,6 +63,7 @@ public class EnrollmentController {
         return ResponseEntity.ok(enrollment);
     }
 
-    public record EnrollRequest(Long studentId, Long courseId) {
-    }
+    public record EnrollRequest(Long studentId, Long courseId) {}
+
+
 }

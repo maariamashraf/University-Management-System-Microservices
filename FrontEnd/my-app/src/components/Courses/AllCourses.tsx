@@ -13,6 +13,9 @@ interface AllCoursesProps {
 }
 //Todo: the courseCard Capacity do not change when the course is enrolled or dropped
 export default function AllCourses({ search = "", department = "all" }: AllCoursesProps) {
+   
+     console.log("this log from all courses component search: ", search, " department: ", department );
+     
     const { courses, isLoading, error } = useGetAllCourses();
     const { enrolledCourses } = useGetAllEnrolledCourses();
 

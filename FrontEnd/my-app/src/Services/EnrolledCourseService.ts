@@ -108,12 +108,7 @@ export async function enrollStudentInCourse(enrolledCourseRequest: EnrolledCours
 export async function unenrollStudentFromCourse(id: number) {
 
     try {
-        const role = getRole();
-        const isTeacher = role === "teacher";
-        const endpoint = isTeacher
-            ? `${ApiUrl}/api/enrolled-courses/teacher/${id}`
-            : `${ApiUrl}/api/enrolled-courses/student/${id}`;
-        console.log("Unenrolling student from course:", id);
+        let endpoint = `${ApiUrl}/api/enrolled-courses/${id}`;
         const response = await axios.delete(endpoint, {
             headers: getAuthHeaders(),
         });
