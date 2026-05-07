@@ -13,11 +13,12 @@ export default function DashboardHeader() {
         queryFn:  () => getUserDashboardData(getToken() ?? ""),
         enabled:  !!getToken(),
     });
-    const displayName = user?.role === "teacher"
+    const resolvedName = user?.role === "teacher"
         ? (user as Teacher).name
         : user?.role === "admin"
             ? (user as AdminUser).username
             : (user as Student)?.username ?? "";
+    const displayName = resolvedName?.trim() || "User";
     const role = user?.role;
 
     const initial = displayName ? displayName.charAt(0).toUpperCase() : "";

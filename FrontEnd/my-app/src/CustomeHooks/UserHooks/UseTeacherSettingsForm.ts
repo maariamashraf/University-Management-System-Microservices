@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import type {
     TeacherProfileForm,
     TeacherNotificationSettings,
@@ -7,11 +8,12 @@ import type {
     TeacherPreferences,
 } from "../../Interfaces/settings";
 import type { Teacher } from "../../Interfaces/teacher";
-import { getUserId } from "../../Services/authService";
+import { getUserId, removeToken, removeUserPermissions } from "../../Services/authService";
 import { updateUserProfile } from "../../Services/userService";
 import { toast } from "sonner";
 
 export function useTeacherSettingsForm(teacher: Teacher | undefined) {
+    const queryClient = useQueryClient();
     const [activeTab, setActiveTab] = useState("profile");
     const [saved, setSaved] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
@@ -75,14 +77,29 @@ export function useTeacherSettingsForm(teacher: Teacher | undefined) {
 
     const handleSave = async () => {
         if (!teacher) return;
+        const userId = getUserId();
         setIsSaving(true);
         setSaved(false);
         try {
             const username = `${form.firstName} ${form.lastName}`.trim().replace(/\s+/g, " ");
-            await updateUserProfile(getUserId(), {
+            const email = form.email.trim();
+            await updateUserProfile(userId, {
                 username,
-                email: form.email.trim(),
+                email,
             });
+            await Promise.all([
+                queryClient.invalidateQueries({ queryKey: ["user"] }),
+                queryClient.invalidateQueries({ queryKey: ["teacher", userId] }),
+            ]);
+
+            const identityChanged = username !== teacher.name || email !== teacher.email;
+            if (identityChanged) {
+                toast.success("Profile updated. Please log in again to refresh your session.");
+                removeToken();
+                removeUserPermissions();
+                window.location.href = "/auth/login";
+                return;
+            }
             setSaved(true);
             toast.success("Profile updated successfully");
             setTimeout(() => setSaved(false), 2500);
