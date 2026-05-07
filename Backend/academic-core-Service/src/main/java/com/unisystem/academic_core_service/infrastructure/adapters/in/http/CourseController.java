@@ -7,6 +7,7 @@ import com.unisystem.academic_core_service.domain.exceptions.CourseNotFoundExcep
 import com.unisystem.academic_core_service.domain.model.Course;
 import com.unisystem.academic_core_service.infrastructure.aop.annotations.AuditLog;
 import com.unisystem.academic_core_service.infrastructure.adapters.in.http.Dto.Request.CreateCourseRequest;
+import com.unisystem.academic_core_service.infrastructure.adapters.in.http.Dto.Request.UpdateCourseRequest;
 import com.unisystem.academic_core_service.infrastructure.adapters.in.http.Dto.Response.CourseCardResponse;
 import com.unisystem.academic_core_service.infrastructure.adapters.in.http.Dto.Response.CoureseDetailsResponse;
 import com.unisystem.academic_core_service.infrastructure.adapters.out.iam.IamClient;
@@ -58,6 +59,32 @@ public class CourseController {
                 .orElseThrow(() -> new CourseNotFoundException(id));
         courseRepositoryPort.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @AuditLog(action = "UPDATE_COURSE")
+    @PutMapping("/{id}")
+    public ResponseEntity<Course> updateCourse(
+            @PathVariable Long id,
+            @RequestBody UpdateCourseRequest request,
+            @RequestHeader(value = "X-User-Id", required = false) String userIdHeader) {
+        Course existingCourse = getCoursesQuery.findById(id)
+                .orElseThrow(() -> new CourseNotFoundException(id));
+
+        Long teacherId = resolveTeacherId(userIdHeader, request.userId());
+        Long departmentId = resolveDepartmentId(request.departmentName());
+
+        existingCourse.setName(request.name());
+        existingCourse.setDescription(request.description());
+        existingCourse.setCourseCode(request.courseCode());
+        existingCourse.setStartDate(request.startDate());
+        existingCourse.setEndDate(request.endDate());
+        existingCourse.setDepartmentId(departmentId);
+        existingCourse.setTeacherId(teacherId);
+        existingCourse.setCredits(request.creditHours());
+        existingCourse.setMaxStudents(request.maxStudents());
+
+        Course updatedCourse = courseRepositoryPort.save(existingCourse);
+        return ResponseEntity.ok(updatedCourse);
     }
 
     @GetMapping("/{id}")

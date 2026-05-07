@@ -1,5 +1,4 @@
 package com.unisystem.academic_core_service.infrastructure.adapters.in.http;
-
 import com.unisystem.academic_core_service.domain.application.port.in.EnrollStudentUseCase;
 import com.unisystem.academic_core_service.domain.application.port.out.CourseRepositoryPort;
 import com.unisystem.academic_core_service.domain.application.port.out.EnrollmentRepositoryPort;
@@ -10,21 +9,19 @@ import com.unisystem.academic_core_service.infrastructure.adapters.out.iam.IamCl
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
 @RestController
 @RequestMapping("/api/enrolled-courses")
 @RequiredArgsConstructor
 public class EnrollmentController {
 
-    private final EnrollStudentUseCase enrollStudentUseCase;
-    private final EnrollmentRepositoryPort enrollmentRepositoryPort;
-    private final CourseRepositoryPort courseRepositoryPort;
-    private final IamClient iamClient;
+private final EnrollStudentUseCase enrollStudentUseCase;
+private final EnrollmentRepositoryPort enrollmentRepositoryPort;
+private final CourseRepositoryPort courseRepositoryPort;
+private final IamClient iamClient;
 
     @PostMapping
     public ResponseEntity<Enrollment> enroll(@RequestBody EnrollRequest request) {
@@ -47,10 +44,10 @@ public class EnrollmentController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/student/{studentId}")
-    public ResponseEntity<List<EnrolledCourseResponse>> getByStudentId(
-            @PathVariable Long studentId,
-            @RequestHeader(value = "Authorization", required = false) String authorization) {
+@GetMapping("/student/{studentId}")
+public ResponseEntity<List<EnrolledCourseResponse>> getByStudentId(
+        @PathVariable Long studentId,
+        @RequestHeader(value = "Authorization", required = false) String authorization) {
         List<Enrollment> enrollments = enrollmentRepositoryPort.findByStudentId(studentId);
         IamClient.StudentBasicResponse studentBasic = iamClient.getStudentBasic(studentId, authorization);
         String studentName = studentBasic != null ? studentBasic.resolveUsername() : "Unknown";
@@ -73,47 +70,47 @@ public class EnrollmentController {
                 .collect(Collectors.toMap(
                         Function.identity(),
                         teacherId -> {
-                            IamClient.TeacherBasicResponse t = iamClient.getTeacherBasic(teacherId, authorization);
-                            return t != null ? t : new IamClient.TeacherBasicResponse(teacherId, "Unknown", null);
+                        IamClient.TeacherBasicResponse t = iamClient.getTeacherBasic(teacherId, authorization);
+                        return t != null ? t : new IamClient.TeacherBasicResponse(teacherId, "Unknown", null);
                         }
                 ));
 
         List<EnrolledCourseResponse> responses = enrollments.stream()
                 .map(enrollment -> {
-                    com.unisystem.academic_core_service.domain.model.Course course = courseById
-                            .get(enrollment.getCourseId());
-                    if (course == null) {
+                com.unisystem.academic_core_service.domain.model.Course course = courseById
+                        .get(enrollment.getCourseId());
+                if (course == null) {
                         return null;
-                    }
-                    IamClient.TeacherBasicResponse teacher = teacherById.get(course.getTeacherId());
-                    String teacherName = teacher != null ? teacher.getTeacherName() : "Unknown";
-                    return EnrolledCourseResponse.builder()
-                            .id(enrollment.getId())
-                            .studentId(enrollment.getStudentId())
-                            .studentName(studentName)
-                            .courseId(course.getId())
-                            .courseCode(course.getCourseCode())
-                            .courseName(course.getName())
-                            .teacherName(teacherName)
-                            .credits(course.getCredits())
-                            .startDate(course.getStartDate() != null ? course.getStartDate().toString() : null)
-                            .endDate(course.getEndDate() != null ? course.getEndDate().toString() : null)
-                            .enrollmentDate(enrollment.getEnrolledAt() != null
-                                    ? enrollment.getEnrolledAt().toString()
-                                    : null)
-                            .enrolledAt(enrollment.getEnrolledAt())
-                            .build();
+                }
+                IamClient.TeacherBasicResponse teacher = teacherById.get(course.getTeacherId());
+                String teacherName = teacher != null ? teacher.getTeacherName() : "Unknown";
+                return EnrolledCourseResponse.builder()
+                        .id(enrollment.getId())
+                        .studentId(enrollment.getStudentId())
+                        .studentName(studentName)
+                        .courseId(course.getId())
+                        .courseCode(course.getCourseCode())
+                        .courseName(course.getName())
+                        .teacherName(teacherName)
+                        .credits(course.getCredits())
+                        .startDate(course.getStartDate() != null ? course.getStartDate().toString() : null)
+                        .endDate(course.getEndDate() != null ? course.getEndDate().toString() : null)
+                        .enrollmentDate(enrollment.getEnrolledAt() != null
+                                ? enrollment.getEnrolledAt().toString()
+                                : null)
+                        .enrolledAt(enrollment.getEnrolledAt())
+                        .build();
                 })
                 .filter(java.util.Objects::nonNull)
                 .toList();
 
         return ResponseEntity.ok(responses);
-    }
+}
 
-    @GetMapping("/course/{courseId}")
-    public ResponseEntity<List<EnrolledCourseResponse>> getByCourseId(
-            @PathVariable Long courseId,
-            @RequestHeader(value = "Authorization", required = false) String authorization) {
+@GetMapping("/course/{courseId}")
+public ResponseEntity<List<EnrolledCourseResponse>> getByCourseId(
+        @PathVariable Long courseId,
+        @RequestHeader(value = "Authorization", required = false) String authorization) {
         List<Enrollment> enrollments = enrollmentRepositoryPort.findByCourseId(courseId);
         com.unisystem.academic_core_service.domain.model.Course course = courseRepositoryPort.findByIds(List.of(courseId))
                 .stream()
@@ -121,7 +118,7 @@ public class EnrollmentController {
                 .orElse(null);
 
         if (course == null) {
-            return ResponseEntity.ok(List.of());
+        return ResponseEntity.ok(List.of());
         }
 
         IamClient.TeacherBasicResponse teacher = course.getTeacherId() != null
@@ -136,8 +133,8 @@ public class EnrollmentController {
                 .collect(Collectors.toMap(
                         Function.identity(),
                         studentId -> {
-                            IamClient.StudentBasicResponse student = iamClient.getStudentBasic(studentId, authorization);
-                            return student != null ? student.resolveUsername() : "Unknown";
+                        IamClient.StudentBasicResponse student = iamClient.getStudentBasic(studentId, authorization);
+                        return student != null ? student.resolveUsername() : "Unknown";
                         }));
 
         List<EnrolledCourseResponse> responses = enrollments.stream()
@@ -160,19 +157,19 @@ public class EnrollmentController {
                 .toList();
 
         return ResponseEntity.ok(responses);
-    }
+}
 
-    @GetMapping("/student/{studentId}/course/{courseId}")
-    public ResponseEntity<Enrollment> getByStudentAndCourse(
-            @PathVariable Long studentId,
-            @PathVariable Long courseId) {
+@GetMapping("/student/{studentId}/course/{courseId}")
+public ResponseEntity<Enrollment> getByStudentAndCourse(
+        @PathVariable Long studentId,
+        @PathVariable Long courseId) {
         Enrollment enrollment = enrollmentRepositoryPort.findByStudentIdAndCourseId(studentId, courseId)
                 .orElseThrow(() -> new InvalidEnrollmentException(
                         "Enrollment not found for student " + studentId + " in course " + courseId));
         return ResponseEntity.ok(enrollment);
-    }
+}
 
-    public record EnrollRequest(Long studentId, Long courseId) {
-    }
+public record EnrollRequest(Long studentId, Long courseId) {
+}
 
 }
