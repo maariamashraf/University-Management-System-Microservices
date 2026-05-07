@@ -9,6 +9,7 @@ import com.uni.iam.exception.UserNotFoundException;
 import com.uni.iam.repository.UserRepository;
 import com.uni.iam.service.interfaces.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +20,7 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional(readOnly = true)
@@ -54,8 +56,12 @@ public class UserServiceImpl implements UserService {
         if (request.getUsername() != null) {
             user.setUsername(request.getUsername());
         }
+
         if (request.getEmail() != null) {
             user.setEmail(request.getEmail());
+        }
+        if (request.getPassword() != null) {
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
         }
 
         return toUserResponse(userRepository.save(user));

@@ -11,6 +11,7 @@ import lombok.Data;
  * Role changes are NOT allowed through this endpoint (security boundary).
  */
 @Data
+
 public class UpdateUserRequest {
 
     @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
@@ -18,4 +19,6 @@ public class UpdateUserRequest {
 
     @Email(message = "Invalid email format")
     private String email;
+
+    private String password;
 }

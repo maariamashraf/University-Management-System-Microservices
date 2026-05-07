@@ -53,6 +53,7 @@ export default function TeacherSetting() {
             <TeacherSettingsHeader
                 teacher={teacher}
                 saved={settings.saved}
+                isSaving={settings.isSaving}
                 onSave={settings.handleSave}
             />
 

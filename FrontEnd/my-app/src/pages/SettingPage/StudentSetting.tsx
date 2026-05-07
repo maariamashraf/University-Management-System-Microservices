@@ -49,6 +49,7 @@ export default function StudentSetting() {
             <StudentSettingsHeader
                 student={student}
                 saved={settings.saved}
+                isSaving={settings.isSaving}
                 onSave={settings.handleSave}
             />
 

@@ -4,6 +4,7 @@ import type { Student } from "../../../Interfaces/student";
 interface StudentSettingsHeaderProps {
     student: Student;
     saved: boolean;
+    isSaving: boolean;
     onSave: () => void;
 }
 
@@ -11,7 +12,7 @@ function buildStudentId(student: Student): string {
     return `HU-${student.enrollmentYear}-${String(student.id).padStart(4, "0")}`;
 }
 
-export default function StudentSettingsHeader({ student, saved, onSave }: StudentSettingsHeaderProps) {
+export default function StudentSettingsHeader({ student, saved, isSaving, onSave }: StudentSettingsHeaderProps) {
     const tags = ["Computer Science", student.academicStanding, "Spring 2026"];
 
     return (
@@ -43,13 +44,16 @@ export default function StudentSettingsHeader({ student, saved, onSave }: Studen
 
             <button
                 onClick={onSave}
+                disabled={isSaving}
                 className={`px-6 py-2.5 rounded-xl text-sm font-semibold text-white transition-all shadow-md flex-shrink-0
-                    ${saved
+                    ${isSaving
+                        ? "bg-gray-400 cursor-not-allowed"
+                        : saved
                         ? "bg-green-500"
                         : "bg-gradient-to-r from-blue-600 to-purple-600 hover:opacity-90"
                     }`}
             >
-                {saved ? "✓ Saved!" : "Save Changes"}
+                {isSaving ? "Saving..." : saved ? "✓ Saved!" : "Save Changes"}
             </button>
         </div>
     );

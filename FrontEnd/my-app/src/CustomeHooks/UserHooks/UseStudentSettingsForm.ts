@@ -5,10 +5,14 @@ import type {
     StudentPrivacySettings,
 } from "../../Interfaces/settings";
 import type { Student } from "../../Interfaces/student";
+import { getUserId } from "../../Services/authService";
+import { updateUserProfile } from "../../Services/userService";
+import { toast } from "sonner";
 
 export function useStudentSettingsForm(student: Student | undefined) {
     const [activeTab, setActiveTab] = useState("profile");
     const [saved, setSaved] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
 
     const [form, setForm] = useState<StudentProfileForm>({
         firstName: "",
@@ -48,15 +52,32 @@ export function useStudentSettingsForm(student: Student | undefined) {
         }));
     }, [student]);
 
-    const handleSave = () => {
-        setSaved(true);
-        setTimeout(() => setSaved(false), 2500);
+    const handleSave = async () => {
+        if (!student) return;
+        setIsSaving(true);
+        setSaved(false);
+        try {
+            const username = `${form.firstName} ${form.lastName}`.trim().replace(/\s+/g, " ");
+            await updateUserProfile(getUserId(), {
+                username,
+                email: form.email.trim(),
+            });
+            setSaved(true);
+            toast.success("Profile updated successfully");
+            setTimeout(() => setSaved(false), 2500);
+        } catch (error) {
+            const message = error instanceof Error ? error.message : "Failed to update profile";
+            toast.error(message);
+        } finally {
+            setIsSaving(false);
+        }
     };
 
     return {
         activeTab,
         setActiveTab,
         saved,
+        isSaving,
         form,
         setForm,
         notifs,

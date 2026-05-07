@@ -4,6 +4,7 @@ import type { Teacher } from "../../../Interfaces/teacher";
 interface TeacherSettingsHeaderProps {
     teacher: Teacher;
     saved: boolean;
+    isSaving: boolean;
     onSave: () => void;
 }
 
@@ -11,7 +12,7 @@ function buildFacultyId(teacher: Teacher): string {
     return `HU-FAC-${String(teacher.teacherId).padStart(4, "0")}`;
 }
 
-export default function TeacherSettingsHeader({ teacher, saved, onSave }: TeacherSettingsHeaderProps) {
+export default function TeacherSettingsHeader({ teacher, saved, isSaving, onSave }: TeacherSettingsHeaderProps) {
     const tags = [teacher.department, `${teacher.coursesCount} Courses`, `${teacher.numberOfStudents} Students`];
 
     return (
@@ -43,13 +44,16 @@ export default function TeacherSettingsHeader({ teacher, saved, onSave }: Teache
 
             <button
                 onClick={onSave}
+                disabled={isSaving}
                 className={`px-6 py-2.5 rounded-xl text-sm font-semibold text-white transition-all shadow-md flex-shrink-0
-                    ${saved
+                    ${isSaving
+                        ? "bg-gray-400 cursor-not-allowed"
+                        : saved
                         ? "bg-green-500"
                         : "bg-gradient-to-r from-blue-600 to-purple-600 hover:opacity-90"
                     }`}
             >
-                {saved ? "✓ Saved!" : "Save Changes"}
+                {isSaving ? "Saving..." : saved ? "✓ Saved!" : "Save Changes"}
             </button>
         </div>
     );

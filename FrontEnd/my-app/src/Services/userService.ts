@@ -3,11 +3,16 @@ import { getTeacherDetails } from "./teacherService";
 import { getStudentInfo } from "./studentService";
 import type { Student } from "../Interfaces/student";
 import type { Teacher } from "../Interfaces/teacher";
-import type { AdminUser, MyTokenPayload } from "../Interfaces/Auth";
-import { jwtDecode } from "jwt-decode";
+import type { AdminUser } from "../Interfaces/Auth";
 import { toast } from "sonner";
 import {ApiUrl,getAuthHeaders} from "./config"
 import axios from "axios";
+
+export interface UpdateUserProfileRequest {
+    username?: string;
+    email?: string;
+    password?: string;
+}
 
 /**
  * BFF (Backend for Frontend) Pattern Implementation
@@ -85,6 +90,25 @@ export async function activateUser(userId: number){
         }
     throw new Error("An error occurred while activating the user");
        }
+}
+
+export async function updateUserProfile(userId: number, request: UpdateUserProfileRequest) {
+    try {
+        const response = await axios.put(`${ApiUrl}/api/users/${userId}`, request, {
+            headers: getAuthHeaders(),
+        });
+        return response.data;
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+            if (error.response) {
+                throw new Error(error.response.data.message || "Failed to update profile");
+            }
+            if (error.request) {
+                throw new Error("No response from server");
+            }
+        }
+        throw new Error("Failed to update profile");
+    }
 }
 
 export async function getUserDashboardData(token: string): Promise<Student | Teacher | AdminUser> {
