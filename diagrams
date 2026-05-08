@@ -1,0 +1,29 @@
+```mermaid
+  sequenceDiagram
+    title 1. User Registration & Profile Logic
+
+    actor S as User
+    participant F as Frontend
+    participant G as API Gateway
+    participant IAM as IAM Service
+    participant DB as Shared Database
+
+    S->>F: Fill Registration Form
+    F->>G: POST /api/auth/register (username, email, role, teacherCode?)
+    G->>IAM: Forward Request
+
+    IAM->>IAM: Validate Unique Email/Username
+
+    alt Role = Teacher
+        IAM->>IAM: Verify teacherCode
+        IAM->>DB: Save Teacher Entity
+    else Role = Student
+        IAM->>DB: Save Teacher Entity
+    end
+
+    IAM->>IAM: Auto-Authenticate & Generate JWT
+
+    IAM-->>G: AuthResponse (JWT)
+    G-->>F: Registration Successful
+    F-->>S: Redirect to Dashboard
+```
