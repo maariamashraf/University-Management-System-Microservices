@@ -18,7 +18,7 @@ import {getRole} from "../../Services/userService";
 const navItems = [
     { label: "Dashboard", icon: LayoutDashboard, to: "/dashboard" },
     { label: "My Courses", icon: BookOpen, to: "/dashboard/Courses" },
-    { label: "Registration", icon: ClipboardList, to: "/dashboard/registration" },
+    { label: "Courses Registration", icon: ClipboardList, to: "/dashboard/registration" },
     { label: "Settings", icon: Settings, to: "/dashboard/settings" },
 ];
 const AdminNavItems = [

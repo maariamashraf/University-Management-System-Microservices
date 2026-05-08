@@ -7,11 +7,12 @@ volumes:
   redis-data:
   kafka-data:
   zookeeper-data:
+  maven-cache: # Named volume for maven dependencies to speed up builds
 
 services:
 
   # ══════════════════════════════════════════
-  #  INFRASTRUCTURE
+  #  INFRASTRUCTURE (Zookeeper, Kafka, Redis)
   # ══════════════════════════════════════════
 
   zookeeper:
@@ -109,7 +110,7 @@ services:
       retries: 5
 
   # ══════════════════════════════════════════
-  #  SHARED DATABASE
+  #  DATABASE
   # ══════════════════════════════════════════
 
   shared-db:
@@ -117,7 +118,7 @@ services:
     container_name: shared-db
     networks: [ unisystem-net ]
     ports:
-      - "3307:3306" # keep host 3306 free for local MySQL
+      - "3307:3306"
     environment:
       MYSQL_ROOT_PASSWORD: "01125867988"
       MYSQL_DATABASE: helwanuni
@@ -144,18 +145,17 @@ services:
     command:
       - |
         set -e
-        schema_exists=$(mysql --host=shared-db --port=3306 --user=root --password="$$MYSQL_ROOT_PASSWORD" --skip-column-names --silent -e "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='helwanuni' AND table_name='users';")
+        schema_exists=$$(mysql --host=shared-db --port=3306 --user=root --password="$$MYSQL_ROOT_PASSWORD" --skip-column-names --silent -e "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='helwanuni' AND table_name='users';")
         if [ "$$schema_exists" -gt 0 ]; then
           echo 'Database schema already exists; skipping bootstrap.'
           exit 0
         fi
         echo 'Running database bootstrap...'
         mysql --host=shared-db --port=3306 --user=root --password="$$MYSQL_ROOT_PASSWORD" --database=helwanuni < /init.sql
-        echo 'Database bootstrap finished.'
     restart: "no"
 
   # ══════════════════════════════════════════
-  #  EUREKA SERVER
+  #  MICROSERVICES (With Hot Reload Support)
   # ══════════════════════════════════════════
 
   eureka-server:
@@ -166,21 +166,20 @@ services:
     networks: [ unisystem-net ]
     ports:
       - "8761:8761"
+    volumes:
+      - ./Backend/eureka-server:/app
+      - maven-cache:/root/.m2
     environment:
       SPRING_APPLICATION_NAME: eureka-server
       SERVER_PORT: 8761
+      SPRING_DEVTOOLS_RESTART_ENABLED: 'true'
       EUREKA_CLIENT_REGISTER_WITH_EUREKA: 'false'
       EUREKA_CLIENT_FETCH_REGISTRY: 'false'
     healthcheck:
-      # تم تعديل Healthcheck هنا ليعمل بـ wget المضمون
       test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8761/actuator/health || exit 1"]
       interval: 15s
       timeout: 10s
       retries: 8
-
-  # ══════════════════════════════════════════
-  #  API GATEWAY
-  # ══════════════════════════════════════════
 
   api-gateway:
     build:
@@ -190,6 +189,9 @@ services:
     networks: [ unisystem-net ]
     ports:
       - "8080:8080"
+    volumes:
+      - ./Backend/api-gateway:/app
+      - maven-cache:/root/.m2
     depends_on:
       eureka-server:
         condition: service_healthy
@@ -198,6 +200,7 @@ services:
     environment:
       SPRING_APPLICATION_NAME: api-gateway
       SERVER_PORT: 8080
+      SPRING_DEVTOOLS_RESTART_ENABLED: 'true'
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka
       EUREKA_INSTANCE_PREFER_IP_ADDRESS: 'true'
       JWT_SECRET: mySuperSecretKey2026UniSystemXYZ!
@@ -209,10 +212,6 @@ services:
       timeout: 10s
       retries: 5
 
-  # ══════════════════════════════════════════
-  #  IAM SERVICE
-  # ══════════════════════════════════════════
-
   iam-service:
     build:
       context: ./Backend/iam-service
@@ -221,6 +220,9 @@ services:
     networks: [ unisystem-net ]
     ports:
       - "8081:8081"
+    volumes:
+      - ./Backend/iam-service:/app
+      - maven-cache:/root/.m2
     depends_on:
       shared-db:
         condition: service_healthy
@@ -231,13 +233,13 @@ services:
     environment:
       SPRING_APPLICATION_NAME: iam-service
       SERVER_PORT: 8081
+      SPRING_DEVTOOLS_RESTART_ENABLED: 'true'
       SPRING_DATASOURCE_URL: jdbc:mysql://shared-db:3306/helwanuni?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: "01125867988"
       SPRING_JPA_HIBERNATE_DDL_AUTO: validate
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka
       EUREKA_INSTANCE_PREFER_IP_ADDRESS: 'true'
-      SPRING_FLYWAY_ENABLED: "false"
       JWT_SECRET: mySuperSecretKey2026UniSystemXYZ!
       JWT_EXPIRATION_MS: 86400000
     healthcheck:
@@ -245,10 +247,6 @@ services:
       interval: 15s
       timeout: 10s
       retries: 8
-
-  # ══════════════════════════════════════════
-  #  ACADEMIC CORE
-  # ══════════════════════════════════════════
 
   academic-core:
     build:
@@ -258,6 +256,9 @@ services:
     networks: [ unisystem-net ]
     ports:
       - "8082:8082"
+    volumes:
+      - ./Backend/academic-core-Service:/app
+      - maven-cache:/root/.m2
     depends_on:
       shared-db:
         condition: service_healthy
@@ -272,11 +273,11 @@ services:
     environment:
       SPRING_APPLICATION_NAME: academic-core
       SERVER_PORT: 8082
+      SPRING_DEVTOOLS_RESTART_ENABLED: 'true'
       SPRING_DATASOURCE_URL: jdbc:mysql://shared-db:3306/helwanuni?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: "01125867988"
       SPRING_JPA_HIBERNATE_DDL_AUTO: validate
-      SPRING_FLYWAY_ENABLED: "false"
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_REDIS_PORT: 6379
@@ -288,10 +289,6 @@ services:
       timeout: 10s
       retries: 8
 
-  # ══════════════════════════════════════════
-  #  COMMUNICATION SERVICE
-  # ══════════════════════════════════════════
-
   communication-service:
     build:
       context: ./Backend/communication-service
@@ -300,29 +297,26 @@ services:
     networks: [ unisystem-net ]
     ports:
       - "8083:8083"
+    volumes:
+      - ./Backend/communication-service:/app
+      - maven-cache:/root/.m2
     depends_on:
       shared-db:
         condition: service_healthy
-      db-init:
-        condition: service_completed_successfully
       kafka:
         condition: service_healthy
       eureka-server:
         condition: service_healthy
-      iam-service:
-        condition: service_healthy
-      academic-core:
-        condition: service_healthy
     environment:
       SPRING_APPLICATION_NAME: communication-service
       SERVER_PORT: 8083
+      SPRING_DEVTOOLS_RESTART_ENABLED: 'true'
       SPRING_DATASOURCE_URL: jdbc:mysql://shared-db:3306/helwanuni?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: "01125867988"
       SPRING_JPA_HIBERNATE_DDL_AUTO: validate
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       SPRING_KAFKA_CONSUMER_GROUP_ID: communication-group
-      SPRING_FLYWAY_ENABLED: 'false'
       JWT_SECRET: mySuperSecretKey2026UniSystemXYZ!
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka
       EUREKA_INSTANCE_PREFER_IP_ADDRESS: 'true'
@@ -333,7 +327,7 @@ services:
       retries: 8
 
   # ══════════════════════════════════════════
-  #  REACT FRONTEND
+  #  FRONTEND
   # ══════════════════════════════════════════
 
   frontend:
@@ -345,6 +339,9 @@ services:
     container_name: frontend
     networks: [ unisystem-net ]
     ports:
-      - "5173:4173"
+      - "5173:5173"
+    volumes:
+      - ./FrontEnd/my-app:/app # Sync frontend code for hot-reload
+      - /app/node_modules # Don't sync node_modules back to host
     depends_on:
       - api-gateway
