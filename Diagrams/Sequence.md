@@ -21,7 +21,7 @@ This flow handles secure user authentication and JWT generation.
         IAM->>IAM: Verify teacherCode
         IAM->>DB: Save Teacher Entity
     else Role = Student
-        IAM->>DB: Save Teacher Entity
+        IAM->>DB: Save Student Entity
     end
 
     IAM->>IAM: Auto-Authenticate & Generate JWT
