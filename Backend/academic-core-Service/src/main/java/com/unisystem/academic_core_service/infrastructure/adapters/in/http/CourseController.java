@@ -1,10 +1,10 @@
 package com.unisystem.academic_core_service.infrastructure.adapters.in.http;
-
 import com.unisystem.academic_core_service.domain.application.port.in.CreateCourseUseCase;
 import com.unisystem.academic_core_service.domain.application.port.in.GetCoursesQuery;
 import com.unisystem.academic_core_service.domain.application.port.out.CourseRepositoryPort;
 import com.unisystem.academic_core_service.domain.exceptions.CourseNotFoundException;
 import com.unisystem.academic_core_service.domain.model.Course;
+import com.unisystem.academic_core_service.infrastructure.adapters.in.http.Mappers.CourseMapper;
 import com.unisystem.academic_core_service.infrastructure.aop.annotations.AuditLog;
 import com.unisystem.academic_core_service.infrastructure.adapters.in.http.Dto.Request.CreateCourseRequest;
 import com.unisystem.academic_core_service.infrastructure.adapters.in.http.Dto.Request.UpdateCourseRequest;
@@ -29,6 +29,8 @@ public class CourseController {
     private final CourseRepositoryPort courseRepositoryPort;
     private final DepartmentJpaRepository departmentJpaRepository;
     private final IamClient iamClient;
+    private final CourseMapper courseMapper;
+
 
     @AuditLog(action = "CREATE_COURSE")
     @PostMapping
@@ -37,18 +39,7 @@ public class CourseController {
             @RequestHeader(value = "X-User-Id", required = false) String userIdHeader) {
         Long teacherId = resolveTeacherId(userIdHeader, request.userId());
         Long departmentId = resolveDepartmentId(request.departmentName());
-
-        CreateCourseUseCase.CreateCourseCommand command = new CreateCourseUseCase.CreateCourseCommand(
-                request.name(),
-                request.courseCode(),
-                request.description(),
-                request.maxStudents(),
-                request.creditHours(),
-                departmentId,
-                teacherId,
-                request.startDate(),
-                request.endDate());
-
+        CreateCourseUseCase.CreateCourseCommand command = courseMapper.courseRequestToCreateCourseCommand(request, teacherId, departmentId);
         Course course = createCourseUseCase.create(command);
         return ResponseEntity.ok(course);
     }
@@ -67,21 +58,14 @@ public class CourseController {
             @PathVariable Long id,
             @RequestBody UpdateCourseRequest request,
             @RequestHeader(value = "X-User-Id", required = false) String userIdHeader) {
+
         Course existingCourse = getCoursesQuery.findById(id)
                 .orElseThrow(() -> new CourseNotFoundException(id));
 
         Long teacherId = resolveTeacherId(userIdHeader, request.userId());
         Long departmentId = resolveDepartmentId(request.departmentName());
 
-        existingCourse.setName(request.name());
-        existingCourse.setDescription(request.description());
-        existingCourse.setCourseCode(request.courseCode());
-        existingCourse.setStartDate(request.startDate());
-        existingCourse.setEndDate(request.endDate());
-        existingCourse.setDepartmentId(departmentId);
-        existingCourse.setTeacherId(teacherId);
-        existingCourse.setCredits(request.creditHours());
-        existingCourse.setMaxStudents(request.maxStudents());
+       existingCourse=courseMapper.UpdateCourseRequestToCourse(request,existingCourse,teacherId,departmentId);
 
         Course updatedCourse = courseRepositoryPort.save(existingCourse);
         return ResponseEntity.ok(updatedCourse);
@@ -99,21 +83,8 @@ public class CourseController {
 
         String teacherUserName = teacherBasic == null ? null : teacherBasic.getTeacherName();
 
-        CoureseDetailsResponse response = CoureseDetailsResponse.builder()
-                .id(course.getId())
-                .name(course.getName())
-                .description(course.getDescription())
-                .courseCode(course.getCourseCode())
-                .startDate(course.getStartDate())
-                .endDate(course.getEndDate())
-                .credits(course.getCredits())
-                .maxStudents(course.getMaxStudents())
-                .enrolledCount(course.getEnrolledCount())
-                .teacherId(course.getTeacherId() == null ? 0 : Math.toIntExact(course.getTeacherId()))
-                .teacherName(teacherUserName)
-                .build();
-
-        return ResponseEntity.ok(response);
+         CoureseDetailsResponse response=courseMapper.courseToCoureseDetailsResponse(course,teacherUserName);
+         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/all")
@@ -128,21 +99,7 @@ public class CourseController {
 
                     String teacherName = teacherBasic == null ? null : teacherBasic.getTeacherName();
 
-                    return CourseCardResponse.builder()
-                            .id(course.getId())
-                            .name(course.getName())
-                            .description(course.getDescription())
-                            .courseCode(course.getCourseCode())
-                            .startDate(course.getStartDate())
-                            .endDate(course.getEndDate())
-                            .teacherName(teacherName)
-                            .teacherUserName(teacherName)
-                            .credits(course.getCredits())
-                            .creditHours(course.getCredits())
-                            .maxStudents(course.getMaxStudents())
-                            .enrolledCount(course.getEnrolledCount())
-                            .enrolledStudents(course.getEnrolledCount())
-                            .build();
+                    return courseMapper.courseToCourseCardResponse(course, teacherName);
                 })
                 .toList();
         return ResponseEntity.ok(response);

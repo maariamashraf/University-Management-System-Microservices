@@ -1,5 +1,4 @@
 package com.uni.iam.controller;
-
 import com.uni.iam.dto.request.UpdateUserRequest;
 import com.uni.iam.dto.response.UserResponse;
 import com.uni.iam.entity.Role;
@@ -10,27 +9,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
-/**
- * CONTROLLER (PRESENTATION) LAYER
- * REST API for all user-management operations.
- *
- * Base path: /api/users
- *
- * Role conventions enforced via @PreAuthorize:
- *   ROLE_ADMIN   — full access
- *   ROLE_TEACHER — read students
- *   ROLE_STUDENT — read/update own profile only
- *
- * NO business logic lives here — only HTTP concerns.
- */
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+
     @GetMapping("/me")
     public ResponseEntity<UserResponse> getCurrentUser(Authentication authentication) {
         String username = authentication.getName();

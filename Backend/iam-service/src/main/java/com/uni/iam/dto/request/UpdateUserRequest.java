@@ -1,15 +1,7 @@
 package com.uni.iam.dto.request;
-
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-
-/**
- * DTO LAYER — Inbound
- * Generic patch request for updating a user profile.
- * All fields are optional — only non-null values are applied.
- * Role changes are NOT allowed through this endpoint (security boundary).
- */
 @Data
 
 public class UpdateUserRequest {

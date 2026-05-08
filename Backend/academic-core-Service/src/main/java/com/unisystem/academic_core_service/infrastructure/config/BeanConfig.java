@@ -22,6 +22,7 @@ import com.unisystem.academic_core_service.domain.application.services.GetCourse
 import com.unisystem.academic_core_service.domain.application.services.GetEnrollmentsService;
 import com.unisystem.academic_core_service.domain.application.services.GetFeedbackService;
 import com.unisystem.academic_core_service.domain.application.services.SubmitFeedbackService;
+import com.unisystem.academic_core_service.infrastructure.adapters.in.http.Mappers.CourseMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
@@ -92,4 +93,8 @@ public class BeanConfig {
         return new RestTemplate();
     }
 
+    @Bean
+    public CourseMapper courseMapper() {
+        return new CourseMapper();
+    }
 }

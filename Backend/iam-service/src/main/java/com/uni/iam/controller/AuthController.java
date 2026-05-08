@@ -33,10 +33,6 @@ public class AuthController {
 
     private final AuthService authService;
 
-    /**
-     * Register a new user (Student, Teacher)
-     * Returns 201 Created + JWT on success.
-     */
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(
             @Valid @RequestBody RegisterRequest request

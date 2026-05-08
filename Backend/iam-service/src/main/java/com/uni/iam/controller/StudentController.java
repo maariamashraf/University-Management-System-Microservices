@@ -3,11 +3,10 @@ package com.uni.iam.controller;
 import com.uni.iam.dto.response.StudentBasicResponse;
 import com.uni.iam.dto.response.StudentResponse;
 import com.uni.iam.dto.response.StudentProfileResponse;
-import com.uni.iam.dto.response.TeacherBasicResponse;
+import com.uni.iam.service.impl.StudentSerivces.StudentDashboardFacade;
 import com.uni.iam.service.interfaces.StudentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,8 +19,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class StudentController {
 
+    private final StudentDashboardFacade studentDashboardFacade;
     private final StudentService studentService;
-
     @GetMapping
     public ResponseEntity<List<StudentResponse>> getAllStudents() {
         return ResponseEntity.ok(studentService.getAllStudents());
@@ -29,11 +28,11 @@ public class StudentController {
 
     @GetMapping("/details/{id}")
     public ResponseEntity<StudentProfileResponse> getStudentDetails(@PathVariable Long id) {
-        return ResponseEntity.ok(studentService.getStudentDetails(id));
+        return ResponseEntity.ok(studentDashboardFacade.getFullStudentDashboard(id));
     }
     @GetMapping("/basic/{id}")
     public ResponseEntity<StudentBasicResponse> getStudentBasic(@PathVariable Long id) {
-        String name=studentService.getStudentName(id);
+        String name=studentService.getStudneName(id);
         StudentBasicResponse response=new StudentBasicResponse(name);
         return ResponseEntity.ok(response);
     }
