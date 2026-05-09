@@ -14,6 +14,13 @@ export const DEPARTMENT_VALUES = [
 export type DepartmentValue = (typeof DEPARTMENT_VALUES)[number];
 
 /**
+ * ('Information_Systems'),
+('Information_Technology'),
+('Computer_Science'),
+('Software_Engineering'),
+('Data_Science'),
+('Artificial_Intelligence'),
+('Cybersecurity');
  * Department options for filter/select dropdowns that need a human-readable label.
  * Includes an "All Departments" sentinel at position 0.
  */

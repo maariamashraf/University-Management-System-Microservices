@@ -9,6 +9,8 @@ export function getRandomColor(): string {
 }
 
 /** Returns the first two letters of a name in uppercase (used for avatar initials). */
-export function getAvatarInitials(name: string): string {
-    return name.slice(0, 2).toUpperCase();
+export function getAvatarInitials(name?: string | null): string {
+    const safeName = (name ?? "").trim();
+    if (!safeName) return "?";
+    return safeName.slice(0, 2).toUpperCase();
 }
