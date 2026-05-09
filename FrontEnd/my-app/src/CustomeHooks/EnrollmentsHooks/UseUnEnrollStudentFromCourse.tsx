@@ -8,6 +8,9 @@ export function useUnEnrollStudentFromCourse() {
         mutationFn: (enrolledCourseId: number) => unenrollStudentFromCourse(enrolledCourseId),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["enrolledCourses"] });
+            queryClient.invalidateQueries({ queryKey: ["allStudentsByCourseId"] });
+            queryClient.invalidateQueries({ queryKey: ["allCourses"] });
+            queryClient.invalidateQueries({ queryKey: ["teacherCourses"] });
         },
         onError: (err) => {
             const errorMsg = err instanceof Error ? err.message : String(err);

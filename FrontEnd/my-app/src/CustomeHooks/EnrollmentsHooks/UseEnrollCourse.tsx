@@ -15,8 +15,10 @@ export const useEnrollCourse = () => {
             const response = await enrollStudentInCourse(enrolledCourseRequest);
             return response.data;
         },
-        onSuccess: () => {
+        onSuccess: (_, courseId) => {
             queryClient.invalidateQueries({ queryKey: ["enrolledCourses"] });
+            queryClient.invalidateQueries({ queryKey: ["allStudentsByCourseId", courseId] });
+            queryClient.invalidateQueries({ queryKey: ["allCourses"] });
         },
         onError: (error) => {
             const message = error instanceof Error ? error.message : String(error);

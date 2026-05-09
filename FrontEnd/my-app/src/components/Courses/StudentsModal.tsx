@@ -5,6 +5,7 @@ import { useGetAllStudentsByCourseId } from "../../CustomeHooks/EnrollmentsHooks
 import { useUnEnrollStudentFromCourse } from "../../CustomeHooks/EnrollmentsHooks/UseUnEnrollStudentFromCourse";
 import { queryClient } from "../../main";
 import type { EnrolledCourseResponse } from "../../Interfaces/enrolledCourse";
+import type { course } from "../../Interfaces/course";
 
 interface Props {
     isOpen: boolean;
@@ -21,6 +22,17 @@ function StudentRow({ enrollment, courseId }: { enrollment: EnrolledCourseRespon
         unenrollStudentFromCourse(enrollment.id, {
             onSuccess: () => {
                 queryClient.invalidateQueries({ queryKey: ["allStudentsByCourseId", courseId] });
+                queryClient.setQueriesData({ queryKey: ["teacherCourses"] }, (oldData: unknown) => {
+                    if (!Array.isArray(oldData)) return oldData;
+                    return (oldData as course[]).map((c) => {
+                        if (c.id !== courseId) return c;
+                        return {
+                            ...c,
+                            enrolledStudents: Math.max(0, Number(c.enrolledStudents ?? 0) - 1),
+                            enrolledCount: Math.max(0, Number(c.enrolledCount ?? c.enrolledStudents ?? 0) - 1),
+                        };
+                    });
+                });
                 queryClient.invalidateQueries({ queryKey: ["teacherCourses"] });
                 setConfirmOpen(false);
             },

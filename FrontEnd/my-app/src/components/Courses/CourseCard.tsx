@@ -5,6 +5,7 @@ import { DEPT_THEME, DEFAULT_THEME, DEPT_ICON, deptLabel, getCapacityPercent } f
 import type { course } from "../../Interfaces/course";
 import type { EnrolledCourseResponse } from "../../Interfaces/enrolledCourse";
 import { getRole } from "../../Services/userService";
+import { useGetAllStudentsByCourseId } from "../../CustomeHooks/EnrollmentsHooks/UseGetAllEnrollmentsByCourseId";
 
 
 export interface CourseCardProps {
@@ -18,12 +19,14 @@ export interface CourseCardProps {
 
 export default function CourseCard({ course, enrollment, onEnroll, onDrop, isEnrolling, isDropping }: CourseCardProps) {
     const navigate = useNavigate();
-    const full     = isCourseFull(course.enrolledStudents, course.maxStudents);
     const enrolled = enrollment !== undefined;
-    const fillPct  = getCapacityPercent(course.enrolledStudents, course.maxStudents);
     const theme    = DEPT_THEME[course.department] ?? DEFAULT_THEME;
     const icon     = DEPT_ICON[course.department] ?? "📚";
     const isTeacher = getRole() === "teacher";
+    const { allStudentsByCourseId, isLoading: isLoadingEnrollments } = useGetAllStudentsByCourseId(course.id);
+    const enrolledStudentsCount = isLoadingEnrollments ? Number(course.enrolledStudents ?? 0) : allStudentsByCourseId.length;
+    const full = isCourseFull(enrolledStudentsCount, course.maxStudents);
+    const fillPct = getCapacityPercent(enrolledStudentsCount, course.maxStudents);
     const formatDate = (value: Date | string) => {
         const date = new Date(value);
         if (Number.isNaN(date.getTime())) return "N/A";
@@ -113,7 +116,7 @@ export default function CourseCard({ course, enrollment, onEnroll, onDrop, isEnr
                             <span className="text-gray-400">Capacity</span>
                         )}
                         <span className={`font-semibold tabular-nums ${full ? "text-red-500" : "text-gray-700"}`}>
-                            {course.enrolledStudents} / {course.maxStudents}
+                            {enrolledStudentsCount} / {course.maxStudents}
                         </span>
                     </div>
                     <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">

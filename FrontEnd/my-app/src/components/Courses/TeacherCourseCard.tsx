@@ -5,6 +5,7 @@ import { isCompleted, getCourseColor, formatCourseDate, CourseIcon } from "../..
 import { useDeleteCourse } from "../../CustomeHooks/CoursesHooks/UseDeleteCourse";
 import { StudentsModal } from "./StudentsModal";
 import { useNavigate } from "react-router-dom";
+import { useGetAllStudentsByCourseId } from "../../CustomeHooks/EnrollmentsHooks/UseGetAllEnrollmentsByCourseId";
 
 interface Props {
     course: course;
@@ -18,14 +19,17 @@ export function TeacherCourseCard({ course, index = 0, onEdit }: Props) {
     const p         = getCourseColor(course.courseCode);
     const { deleteCourse, isPending: isDeleting } = useDeleteCourse();
     const [studentsOpen, setStudentsOpen] = useState(false);
+    const { allStudentsByCourseId } = useGetAllStudentsByCourseId(course.id);
 
     const startLabel = formatCourseDate(String(course.startDate));
     const endLabel   = formatCourseDate(String(course.endDate));
+    const enrolledStudentsCount = allStudentsByCourseId.length;
+    const seatsLeft = Math.max(0, course.maxStudents - enrolledStudentsCount);
 
     const enrolledPct = course.maxStudents > 0
-        ? Math.round((course.enrolledStudents / course.maxStudents) * 100)
+        ? Math.round((enrolledStudentsCount / course.maxStudents) * 100)
         : 0;
-    const isFull = course.enrolledStudents >= course.maxStudents;
+    const isFull = enrolledStudentsCount >= course.maxStudents;
 
     return (
         <motion.div
@@ -108,10 +112,10 @@ export function TeacherCourseCard({ course, index = 0, onEdit }: Props) {
                 <div className="mt-auto pt-3 border-t border-gray-100 flex flex-col gap-1.5">
                     <div className="flex items-center justify-between text-xs">
                         <span className={`font-semibold ${p.pillText}`}>
-                            {course.enrolledStudents} / {course.maxStudents} students
+                            {enrolledStudentsCount} / {course.maxStudents} students
                         </span>
                         <span className={`font-medium ${isFull ? "text-rose-500" : "text-gray-400"}`}>
-                            {isFull ? "Full" : `${course.maxStudents - course.enrolledStudents} seats left`}
+                            {isFull ? "Full" : `${seatsLeft} seats left`}
                         </span>
                     </div>
                     <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
@@ -139,7 +143,7 @@ export function TeacherCourseCard({ course, index = 0, onEdit }: Props) {
                         <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
                         <path d="M16 3.13a4 4 0 0 1 0 7.75" />
                     </svg>
-                    View Students ({course.enrolledStudents})
+                    View Students ({enrolledStudentsCount})
                 </motion.button>
                 {/* CourseDetails button that will direct to the course details page that have all course data and material and announcements */}
                 <motion.button
