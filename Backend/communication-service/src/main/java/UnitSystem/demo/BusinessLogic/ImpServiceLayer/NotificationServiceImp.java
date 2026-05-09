@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -102,9 +103,10 @@ public class NotificationServiceImp implements NotificationService {
         Notification notification = notificationMapper.mapToNotificationEntity(notificationRequest);
         notificationRepository.save(notification);
         NotificationResponse response = notificationMapper.mapToNotificationResponse(notification);
+        String wsPrincipal = resolveWsPrincipal(notification);
 
         simpMessagingTemplate.convertAndSendToUser(
-                notification.getRecipient().getEmail(),
+                wsPrincipal,
                 "/queue/notifications",
                 response);
     }
@@ -123,11 +125,21 @@ public class NotificationServiceImp implements NotificationService {
 
         notificationRepository.saveAll(notifications);
 
-        notifications.forEach(notification ->
-                simpMessagingTemplate.convertAndSendToUser(
-                        notification.getRecipient().getEmail(),
-                        "/queue/notifications",
-                        notificationMapper.mapToNotificationResponse(notification)));
+        notifications.forEach(notification -> {
+            String wsPrincipal = resolveWsPrincipal(notification);
+
+            simpMessagingTemplate.convertAndSendToUser(
+                    wsPrincipal,
+                    "/queue/notifications",
+                    notificationMapper.mapToNotificationResponse(notification));
+        });
+    }
+
+    private String resolveWsPrincipal(Notification notification) {
+        String userName = notification.getRecipient().getUserName();
+        if (userName != null && !userName.isBlank()) return userName;
+        return Objects.requireNonNull(notification.getRecipient().getEmail(),
+                "Recipient email is required when username is missing");
     }
 
     // ────────────────────────────────────────────────────────
