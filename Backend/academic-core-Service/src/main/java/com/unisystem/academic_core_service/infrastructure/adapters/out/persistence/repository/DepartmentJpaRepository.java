@@ -4,7 +4,9 @@ import com.unisystem.academic_core_service.infrastructure.adapters.out.persisten
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface DepartmentJpaRepository extends JpaRepository<DepartmentEntity, Long> {
     List<DepartmentEntity> findByNameIgnoreCase(String name);
+    Optional<DepartmentEntity> findByName(String name);
 }

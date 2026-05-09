@@ -15,14 +15,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-/**
- * WebSocket Security:
- * Validates JWT token when a client connects via WebSocket.
- * If token is valid → connection allowed.
- * If token is missing or invalid → connection rejected.
- *
- * REST API endpoints are NOT affected by this interceptor.
- */
+
 @Component
 @RequiredArgsConstructor
 @Slf4j

@@ -24,6 +24,19 @@ export default function CourseCard({ course, enrollment, onEnroll, onDrop, isEnr
     const theme    = DEPT_THEME[course.department] ?? DEFAULT_THEME;
     const icon     = DEPT_ICON[course.department] ?? "📚";
     const isTeacher = getRole() === "teacher";
+    const formatDate = (value: Date | string) => {
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return "N/A";
+        return date.toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+        });
+    };
+
+    const startLabel = formatDate(course.startDate);
+    const endLabel = formatDate(course.endDate);
+
     return (
         <motion.div
             initial={{ opacity: 0, y: 16 }}
@@ -79,6 +92,16 @@ export default function CourseCard({ course, enrollment, onEnroll, onDrop, isEnr
                             <span className="text-xs text-gray-500 truncate">{course.teacherName}</span>
                         </div>
                     )}
+                </div>
+
+                {/* Course dates */}
+                <div className="flex flex-wrap gap-1.5">
+                    <span className="inline-flex items-center gap-1 text-[11px] text-gray-500 bg-gray-50 border border-gray-100 px-2 py-0.5 rounded-full">
+                        <span className="font-medium text-gray-600">Start:</span> {startLabel}
+                    </span>
+                    <span className="inline-flex items-center gap-1 text-[11px] text-gray-500 bg-gray-50 border border-gray-100 px-2 py-0.5 rounded-full">
+                        <span className="font-medium text-gray-600">End:</span> {endLabel}
+                    </span>
                 </div>
 
                 {/* Capacity bar */}

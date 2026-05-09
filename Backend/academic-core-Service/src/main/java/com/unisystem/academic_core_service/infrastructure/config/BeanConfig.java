@@ -93,8 +93,4 @@ public class BeanConfig {
         return new RestTemplate();
     }
 
-    @Bean
-    public CourseMapper courseMapper() {
-        return new CourseMapper();
-    }
 }

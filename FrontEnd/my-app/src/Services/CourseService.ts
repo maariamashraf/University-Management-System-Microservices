@@ -66,7 +66,7 @@ export async function getAllCourses() {
         // Backend returns a plain array with different field names — map to the course interface
         return (response.data as any[]).map((c) => ({
             ...c,
-            department:  c.departmentName,
+            department:  c.department,
             teacherName: c.teacherUserName,
             credits:     c.creditHours,
         }));
@@ -181,7 +181,21 @@ export async function getAllCoursesByTeacherId(teacherId: number) {
         const response = await axios.get(`${ApiUrl}/api/courses/teacher/${teacherId}`, {
             headers: getAuthHeaders(),
         });
-        return response.data;
+        return (response.data as any[]).map((c) => {
+            const enrolledStudents = Number(c.enrolledStudents ?? c.enrolledCount ?? 0);
+            const maxStudents = Number(c.maxStudents ?? 0);
+
+            return {
+                ...c,
+                department: c.department ?? c.departmentName,
+                teacherName: c.teacherName ?? c.teacherUserName,
+                credits: Number(c.credits ?? c.creditHours ?? 0),
+                enrolledStudents: Number.isFinite(enrolledStudents) ? enrolledStudents : 0,
+                maxStudents: Number.isFinite(maxStudents) ? maxStudents : 0,
+                teacherUserName: c.teacherUserName ?? c.teacherName,
+                creditHours: Number(c.creditHours ?? c.credits ?? 0),
+            };
+        });
     }catch(error){
         if(axios.isAxiosError(error)){
             if(error.response){

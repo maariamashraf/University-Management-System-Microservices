@@ -29,6 +29,8 @@ export default function AllCourses({ search = "", department = "all" }: AllCours
         enrolledCourses.map((ec: EnrolledCourseResponse) => [ec.courseId, ec])
     );
 
+    console.log("this log from all courses component courses: ", courses);
+    
     if (isLoading) return <LoadingSpinner />;
 
     if (error) return (

@@ -13,10 +13,8 @@ public class StudentDashboardFacade {
     private final AcademicAggregationService academicService;
 
     public StudentProfileResponse getFullStudentDashboard(Long studentId) {
-        // English comment: Step 1: Get basic info from our core service
         var student = studentService.getById(studentId);
 
-        // English comment: Step 2: Orchestrate the complex data gathering
         return academicService.assembleStudentProfile(student);
     }
 }

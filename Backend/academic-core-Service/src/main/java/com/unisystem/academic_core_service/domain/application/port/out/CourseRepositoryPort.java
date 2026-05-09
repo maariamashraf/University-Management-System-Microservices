@@ -17,5 +17,4 @@ public interface CourseRepositoryPort {
     List<Course> findByTeacherId(Long TeacherId);
     Optional<Course> findByCourseName(String courseName);
     List<Course> findByDepartmentName(String departmentName);
-
 }

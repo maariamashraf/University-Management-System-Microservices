@@ -18,6 +18,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class AcademicAggregationService {
+    
     private final AcademicCoreClient academicCoreClient;
     private final AnnouncementMapper announcementMapper;
     private final EnrollmentMapper enrollmentMapper;
